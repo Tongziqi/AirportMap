@@ -51,7 +51,7 @@ public class NetConnection {
     public ArrayList<Point> getPoint() {
         ArrayList<Point> points = new ArrayList<Point>();
         try {
-            String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
+            String url = Uri.parse(SEVER_URL_TEST).buildUpon()
                     .appendQueryParameter("action", Test)
                     .build().toString();
             String pointString = getUrl(url);

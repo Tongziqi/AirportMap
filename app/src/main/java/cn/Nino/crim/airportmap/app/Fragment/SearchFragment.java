@@ -1,11 +1,13 @@
 package cn.Nino.crim.airportmap.app.Fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import cn.Nino.crim.airportmap.app.Activity.AirportActivity;
 import cn.Nino.crim.airportmap.app.Point.Point;
 import cn.Nino.crim.airportmap.app.Point.PointLab;
 import cn.Nino.crim.airportmap.app.R;
@@ -17,9 +19,15 @@ import java.util.ArrayList;
  */
 public class SearchFragment extends Fragment {
     public static final String EXTRA_END_PLACE = "endPlace";
+    public static final String EXTRA_END_PLACE_X = "x";
+    public static final String EXTRA_END_PLACE_Y = "y";
+    public static final String EXTRA_END_PLACE_Z = "z";
+    public static final String EXTRA_END_PLACE_NAME = "endPlaceName";
     private ArrayList<Point> mPointList;
     private EditText mStartPlace, mEndPlace;
     private String mEndPlaceString;
+    private Button navigationButton;
+    private Point endPoint;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +50,7 @@ public class SearchFragment extends Fragment {
         mEndPlace.setText(mEndPlaceString);
         mEndPlace.setFocusable(false);
         mEndPlace.setEnabled(false);
+        navigationButton = (Button) view.findViewById(R.id.navigation_button);
 
         mPointList = PointLab.getmPointLab(getActivity(), mEndPlaceString).getmPointList();
 
@@ -51,8 +60,21 @@ public class SearchFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                endPoint = mPointList.get(position);
                 mEndPlace.setText(mPointList.get(position).getmTittle());
                 Toast.makeText(getActivity().getApplicationContext(), mPointList.get(position).getmTittle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        navigationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AirportActivity.class);
+                intent.putExtra(EXTRA_END_PLACE_NAME, endPoint.getmTittle());
+                intent.putExtra(EXTRA_END_PLACE_X, endPoint.getPointX());
+                intent.putExtra(EXTRA_END_PLACE_Y, endPoint.getPointY());
+                intent.putExtra(EXTRA_END_PLACE_Z, endPoint.getPointZ());
+                startActivity(intent);
             }
         });
         return view;

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ public class AirportFragment extends Fragment {
     private ImageButton mImageButtonLocation, mImageButtonSearch;
     private EditText mThePlaceYouWantGo;
     private Handler refurbishHandler = new Handler();
+    private Point endPoint;
 
     ArrayList<Point> mPoints;
 
@@ -36,6 +38,11 @@ public class AirportFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String name = getActivity().getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
+        double x = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
+        double y = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
+        double z = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
+        endPoint = new Point(name, x, y, z);
     }
 
     @Nullable
@@ -71,11 +78,17 @@ public class AirportFragment extends Fragment {
                 new NetTask().execute();
                 refurbishHandler.removeCallbacks(runnable);
                 refurbishHandler.postDelayed(runnable, 1000);  // 定时刷新任务
+                Log.e(TAG,
+                        "name:" + endPoint.getmTittle()
+                                + "  x:" + String.valueOf(endPoint.getPointX())
+                                + "  y:" + String.valueOf(endPoint.getPointY())
+                                + "  sz:" + String.valueOf(endPoint.getPointZ()));
             }
         });
         mImageButtonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                refurbishHandler.removeCallbacks(runnable);
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
                 intent.putExtra(SearchFragment.EXTRA_END_PLACE, String.valueOf(mThePlaceYouWantGo.getText()));
                 startActivityForResult(intent, SEARCH_CODE);
