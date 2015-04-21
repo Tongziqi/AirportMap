@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_margin="10dp">
+        <EditText android:layout_width="200dp"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/search_place"
+                  android:text="@string/search_place"
+                  android:inputType="text"/>
+        <ImageButton android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:id="@+id/search_place_button"
+                     android:background="@android:drawable/ic_search_category_default"
+                     android:contentDescription="@string/search_button"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        <cn.Nino.crim.airportmap.app.Map.Map
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/surfaceView"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_margin="10dp">
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1">
+            <ImageButton android:layout_width="50dp"
+                         android:layout_height="50dp"
+                         android:background="@drawable/location"
+                         android:id="@+id/location_button"/>
+            <ZoomControls
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/zoomControls"
+                    android:layout_gravity="bottom"
+                    android:clickable="false"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+            <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/B1"
+                    android:id="@+id/button_b1"/>
+            <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/F1"
+                    android:id="@+id/button_f1"/>
+            <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/F2"
+                    android:id="@+id/button_f2"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+</LinearLayout>
