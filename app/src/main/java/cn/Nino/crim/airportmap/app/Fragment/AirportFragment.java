@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import cn.Nino.crim.airportmap.app.Activity.SearchActivity;
-import cn.Nino.crim.airportmap.app.Map.Map;
+import cn.Nino.crim.airportmap.app.Map.MapInSize;
 import cn.Nino.crim.airportmap.app.Point.Point;
 import cn.Nino.crim.airportmap.app.R;
 import cn.Nino.crim.airportmap.app.net.NetConnection;
@@ -31,7 +31,8 @@ public class AirportFragment extends Fragment {
     private EditText mThePlaceYouWantGo;
     private Handler refurbishHandler = new Handler();
     private Point endPoint;
-
+    private Point startPoint;
+    private String startPointAndendPoint;
     ArrayList<Point> mPoints;
 
 
@@ -62,6 +63,8 @@ public class AirportFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getActivity(), "放大图片", Toast.LENGTH_SHORT).show();
+                // refurbishHandler.removeCallbacks(runnable);
+                // initMap();
             }
         });
 
@@ -82,7 +85,7 @@ public class AirportFragment extends Fragment {
                         "name:" + endPoint.getmTittle()
                                 + "  x:" + String.valueOf(endPoint.getPointX())
                                 + "  y:" + String.valueOf(endPoint.getPointY())
-                                + "  sz:" + String.valueOf(endPoint.getPointZ()));
+                                + "  z:" + String.valueOf(endPoint.getPointZ()));
             }
         });
         mImageButtonSearch.setOnClickListener(new View.OnClickListener() {
@@ -98,19 +101,19 @@ public class AirportFragment extends Fragment {
         mButtonB1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map.getMapActivity().setBackground(0);
+                MapInSize.getMapActivity().setBackground(0);
             }
         });
         mButtonF1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map.getMapActivity().setBackground(1);
+                MapInSize.getMapActivity().setBackground(1);
             }
         });
         mButtonF2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Map.getMapActivity().setBackground(2);
+                MapInSize.getMapActivity().setBackground(2);
             }
         });
         mThePlaceYouWantGo.setOnClickListener(new View.OnClickListener() {
@@ -133,22 +136,26 @@ public class AirportFragment extends Fragment {
     }
 
     private class NetTask extends AsyncTask<Void, Void, ArrayList<Point>> {
-
         @Override
         protected ArrayList<Point> doInBackground(Void... params) {
-            return new NetConnection().getPoint();
+            if (endPoint.getmTittle() == null) {
+                return new NetConnection().getPoint();
+            } else {
+                startPointAndendPoint="0.1,0.1,0.0,0.9,0.2,0.0";
+                return new NetConnection().getPathPoint(startPointAndendPoint);
+            }
         }
-
 
         @Override
         protected void onPostExecute(ArrayList<Point> points) {
             mPoints = points;
             if (mPoints.size() == 1) {
-                Map.getMapActivity().cleanPoint();
-                Map.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
-                Map.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
+                startPoint = mPoints.get(0);
+                MapInSize.getMapActivity().cleanPoint();
+                MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
+                MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
             } else {
-                Map.getMapActivity().redrawLine(mPoints);
+                MapInSize.getMapActivity().redrawLine(mPoints);
             }
         }
     }
@@ -160,5 +167,13 @@ public class AirportFragment extends Fragment {
         }
     };
 
+    private void initMap() {
+        if (startPoint != null && endPoint != null) {
+            String startPointString = startPoint.getPointString(startPoint);
+            String endPointString = endPoint.getPointString(endPoint);
+            startPointAndendPoint = startPointString + "," + endPointString;
+            Log.e(TAG, startPointAndendPoint);
+        }
 
+    }
 }
