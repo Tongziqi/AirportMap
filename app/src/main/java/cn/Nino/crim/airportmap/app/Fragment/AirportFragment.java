@@ -30,8 +30,8 @@ public class AirportFragment extends Fragment {
     private ImageButton mImageButtonLocation, mImageButtonSearch;
     private EditText mThePlaceYouWantGo;
     private Handler refurbishHandler = new Handler();
-    private Point endPoint;
-    private Point startPoint;
+    private Point endPoint = null;
+    private Point startPoint = null;
     private String startPointAndendPoint;
     ArrayList<Point> mPoints;
 
@@ -44,6 +44,8 @@ public class AirportFragment extends Fragment {
         double y = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
         double z = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
         endPoint = new Point(name, x, y, z);
+        startPoint = new Point();
+        //initMap();
     }
 
     @Nullable
@@ -63,8 +65,6 @@ public class AirportFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getActivity(), "放大图片", Toast.LENGTH_SHORT).show();
-                // refurbishHandler.removeCallbacks(runnable);
-                // initMap();
             }
         });
 
@@ -141,7 +141,7 @@ public class AirportFragment extends Fragment {
             if (endPoint.getmTittle() == null) {
                 return new NetConnection().getPoint();
             } else {
-                startPointAndendPoint="0.1,0.1,0.0,0.9,0.2,0.0";
+                initMap();
                 return new NetConnection().getPathPoint(startPointAndendPoint);
             }
         }
@@ -150,13 +150,27 @@ public class AirportFragment extends Fragment {
         protected void onPostExecute(ArrayList<Point> points) {
             mPoints = points;
             if (mPoints.size() == 1) {
-                startPoint = mPoints.get(0);
+                startPoint.setPointX(mPoints.get(0).getPointX());
+                startPoint.setPointY(mPoints.get(0).getPointY());
+                startPoint.setPointZ(mPoints.get(0).getPointZ());
+                Log.e(TAG, startPoint.getmTittle()
+                        + "  x:" + String.valueOf(startPoint.getPointX())
+                        + "  y:" + String.valueOf(startPoint.getPointY())
+                        + "  z:" + String.valueOf(startPoint.getPointZ()));
                 MapInSize.getMapActivity().cleanPoint();
                 MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
                 MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
             } else {
                 MapInSize.getMapActivity().redrawLine(mPoints);
             }
+        }
+
+        @Override
+        protected void onCancelled(ArrayList<Point> points) {
+            super.onCancelled(points);
+            startPoint.setPointX(mPoints.get(0).getPointX());
+            startPoint.setPointY(mPoints.get(0).getPointY());
+            startPoint.setPointZ(mPoints.get(0).getPointZ());
         }
     }
 
@@ -171,7 +185,7 @@ public class AirportFragment extends Fragment {
         if (startPoint != null && endPoint != null) {
             String startPointString = startPoint.getPointString(startPoint);
             String endPointString = endPoint.getPointString(endPoint);
-            startPointAndendPoint = startPointString + "," + endPointString;
+            startPointAndendPoint = startPointString + "/" + endPointString;
             Log.e(TAG, startPointAndendPoint);
         }
 
