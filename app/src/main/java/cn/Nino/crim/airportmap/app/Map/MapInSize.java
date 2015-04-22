@@ -13,9 +13,9 @@ import java.util.ArrayList;
 /**
  * Created by Administrator on 2015/3/30 0030.
  */
-public class Map extends SurfaceView {
+public class MapInSize extends SurfaceView {
     private SurfaceHolder mHolder;
-    private static Map mapActivity = null;
+    private static MapInSize mapActivity = null;
     int map_x, map_y;
 
     public int getMap_x() {
@@ -28,7 +28,7 @@ public class Map extends SurfaceView {
         return map_y;
     }
 
-    public Map(Context context, AttributeSet attrs) {
+    public MapInSize(Context context, AttributeSet attrs) {
         super(context, attrs);
         mHolder = getHolder();
         setZOrderOnTop(true);
@@ -51,7 +51,7 @@ public class Map extends SurfaceView {
 
     }
 
-    public static Map getMapActivity() {
+    public static MapInSize getMapActivity() {
         return mapActivity;
     }
 

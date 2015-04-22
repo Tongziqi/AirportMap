@@ -18,9 +18,9 @@ public class Point {
 
     public Point() {
         mTittle = "test";
-        pointX = 1;
-        pointY = 1;
-        pointZ = 0;
+        pointX = 0.1;
+        pointY = 0.1;
+        pointZ = 0.0;
     }
 
 
@@ -59,5 +59,13 @@ public class Point {
     @Override
     public String toString() {
         return mTittle;
+    }
+
+    public String getPointString(Point point) {
+
+        return String.valueOf(point.getPointX()) + ","
+                + String.valueOf(point.getPointY()) + ","
+                + String.valueOf(point.getPointZ());
+
     }
 }

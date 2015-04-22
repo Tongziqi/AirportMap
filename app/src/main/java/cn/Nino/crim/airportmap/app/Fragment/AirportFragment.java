@@ -40,12 +40,15 @@ public class AirportFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         String name = getActivity().getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
-        double x = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
-        double y = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
-        double z = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
-        endPoint = new Point(name, x, y, z);
-        startPoint = new Point();
-        //initMap();
+        double endPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
+        double endPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
+        double endPointZ = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
+        endPoint = new Point(name, endPointX, endPointY, endPointZ);
+
+        double startPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_X, 0);
+        double startPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Y, 0);
+        double startPointZ = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Z, 0);
+        startPoint = new Point("startPoint", startPointX, startPointY, startPointZ);
     }
 
     @Nullable
@@ -94,6 +97,9 @@ public class AirportFragment extends Fragment {
                 refurbishHandler.removeCallbacks(runnable);
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
                 intent.putExtra(SearchFragment.EXTRA_END_PLACE, String.valueOf(mThePlaceYouWantGo.getText()));
+                intent.putExtra(SearchFragment.EXTRA_START_PLACE_X, String.valueOf(startPoint.getPointX()));
+                intent.putExtra(SearchFragment.EXTRA_START_PLACE_Y, String.valueOf(startPoint.getPointY()));
+                intent.putExtra(SearchFragment.EXTRA_START_PLACE_Z, String.valueOf(startPoint.getPointZ()));
                 startActivityForResult(intent, SEARCH_CODE);
             }
         });
@@ -150,11 +156,8 @@ public class AirportFragment extends Fragment {
         protected void onPostExecute(ArrayList<Point> points) {
             mPoints = points;
             if (mPoints.size() == 1) {
-                startPoint.setPointX(mPoints.get(0).getPointX());
-                startPoint.setPointY(mPoints.get(0).getPointY());
-                startPoint.setPointZ(mPoints.get(0).getPointZ());
-                Log.e(TAG, startPoint.getmTittle()
-                        + "  x:" + String.valueOf(startPoint.getPointX())
+                saveStartPoint(points);
+                Log.e(TAG, "  x:" + String.valueOf(startPoint.getPointX())
                         + "  y:" + String.valueOf(startPoint.getPointY())
                         + "  z:" + String.valueOf(startPoint.getPointZ()));
                 MapInSize.getMapActivity().cleanPoint();
@@ -167,10 +170,9 @@ public class AirportFragment extends Fragment {
 
         @Override
         protected void onCancelled(ArrayList<Point> points) {
-            super.onCancelled(points);
-            startPoint.setPointX(mPoints.get(0).getPointX());
-            startPoint.setPointY(mPoints.get(0).getPointY());
-            startPoint.setPointZ(mPoints.get(0).getPointZ());
+            startPoint.setPointX(points.get(0).getPointX());
+            startPoint.setPointY(points.get(0).getPointY());
+            startPoint.setPointZ(points.get(0).getPointZ());
         }
     }
 
@@ -188,6 +190,12 @@ public class AirportFragment extends Fragment {
             startPointAndendPoint = startPointString + "/" + endPointString;
             Log.e(TAG, startPointAndendPoint);
         }
+    }
 
+    private Point saveStartPoint(ArrayList<Point> points) {
+        startPoint.setPointX(points.get(0).getPointX());
+        startPoint.setPointY(points.get(0).getPointY());
+        startPoint.setPointZ(points.get(0).getPointZ());
+        return startPoint;
     }
 }

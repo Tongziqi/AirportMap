@@ -17,10 +17,11 @@ import java.util.ArrayList;
 public class NetConnection {
     public static final String TAG = "AirporMap";
     public static final String SEVER_URL_TEST = "http://172.18.4.184:8080/SecretWebSever/api.jsp";
-    public static final String SEVER_URL_FORMAL = "http://172.18.4.166:8080/Servlet.view";
+    public static final String SEVER_URL_FORMAL = "http://172.18.4.166:8080/Access";
     public static final String SEVER_URL_OPEN = "http://172.21.14.44:8080/user/Access";
     public static final String ACTION_LOCATE = "locate";
     public static final String Test = "test";
+    public static final String Path = "getPath";
 
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
@@ -48,12 +49,9 @@ public class NetConnection {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public ArrayList<Point> getPoint() {
+    public ArrayList<Point> downloadPoint(String url) {
         ArrayList<Point> points = new ArrayList<Point>();
         try {
-            String url = Uri.parse(SEVER_URL_TEST).buildUpon()
-                    .appendQueryParameter("action", Test)
-                    .build().toString();
             String pointString = getUrl(url);
             String array[] = pointString.split(",");
 
@@ -71,6 +69,22 @@ public class NetConnection {
         }
         return points;
     }
+
+    public ArrayList<Point> getPoint() {
+        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
+                .appendQueryParameter("action", ACTION_LOCATE)
+                .build().toString();
+        return downloadPoint(url);
+    }
+
+    public ArrayList<Point> getPathPoint(String points) {
+        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
+                .appendQueryParameter("action", Path)
+                .appendQueryParameter("Points", points)
+                .build().toString();
+        return downloadPoint(url);
+    }
+
 }
 
 
