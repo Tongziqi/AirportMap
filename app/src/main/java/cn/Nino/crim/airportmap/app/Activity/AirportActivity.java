@@ -9,5 +9,4 @@ public class AirportActivity extends SingleFragmentActivity {
     protected Fragment creatFragment() {
         return new AirportFragment();
     }
-
 }

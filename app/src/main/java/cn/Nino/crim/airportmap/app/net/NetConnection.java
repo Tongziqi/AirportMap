@@ -71,18 +71,41 @@ public class NetConnection {
     }
 
     public ArrayList<Point> getPoint() {
-        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
+        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
         return downloadPoint(url);
     }
 
-    public ArrayList<Point> getPathPoint(String points) {
-        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
-                .appendQueryParameter("action", Path)
-                .appendQueryParameter("Points", points)
+    public ArrayList<Point> getPathPoint(String nativePoints) {
+        String urlPoint = Uri.parse(SEVER_URL_OPEN).buildUpon()
+                .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
-        return downloadPoint(url);
+        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
+                .appendQueryParameter("action", Path)
+                .appendQueryParameter("Points", nativePoints)
+                .build().toString();
+        //return downloadPoint(url);
+        ArrayList<Point> points = new ArrayList<Point>();
+        try {
+            String pointString = getUrl(url);
+            String pointStringUrlPoint = getUrl(urlPoint);
+            String test = pointStringUrlPoint + "," + pointString;
+            String array[] = test.split(",");
+
+            for (int i = 0; i < array.length; ) {
+                Point item = new Point();
+                item.setPointX(Double.valueOf(array[i]));
+                item.setPointY(Double.valueOf(array[i + 1]));
+                item.setPointZ(Double.valueOf(array[i + 2]));
+                i = i + 3;
+                points.add(item);
+            }
+
+        } catch (IOException i) {
+            Log.e(TAG, "Failed to  connection", i);
+        }
+        return points;
     }
 
 }

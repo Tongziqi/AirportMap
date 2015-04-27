@@ -73,6 +73,8 @@ public class MapInSize extends SurfaceView {
 
 
     public void redrawLine(ArrayList<cn.Nino.crim.airportmap.app.Point.Point> points) {
+        double pointX = points.get(0).getPointX();
+        double pointY = points.get(0).getPointY();
         Canvas mCanvas = mHolder.lockCanvas();
         Paint mPaint = new Paint();
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
@@ -87,14 +89,20 @@ public class MapInSize extends SurfaceView {
                 null, Shader.TileMode.REPEAT);
         mPaint.setShader(mShader);
 
+        Paint mPaintCircle = new Paint();
+        mPaintCircle.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
+        mPaintCircle.setColor(Color.RED);
+
         for (int i = 0; i < points.size() - 1; i++) {
             checkFloorZ(points.get(i).getPointZ());
             if (points.get(i).getPointZ() != 0.0 && points.get(i + 1).getPointZ() != 0.0) {
+                mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaintCircle);
                 mCanvas.drawLine((float) (points.get(i).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i).getPointY())),
                         (float) (points.get(i + 1).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i + 1).getPointY())), mPaint);
             } else if (points.get(i).getPointY() > 0.38 || points.get(i + 1).getPointY() > 0.38) {
                 Toast.makeText(getContext().getApplicationContext(), "对不起已经超出范围", Toast.LENGTH_SHORT).show();
             } else {
+                mCanvas.drawCircle((float) (getMap_x() * pointX), (float) ((getMap_y() * (1 - pointY / 0.38))), 10, mPaintCircle);
                 mCanvas.drawLine((float) (points.get(i).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i).getPointY() / 0.38)),
                         (float) (points.get(i + 1).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i + 1).getPointY() / 0.38)), mPaint);
             }

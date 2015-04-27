@@ -1,5 +1,6 @@
 package cn.Nino.crim.airportmap.app.Fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ public class SearchFragment extends Fragment {
     public static final String EXTRA_END_PLACE_Y = "endy";
     public static final String EXTRA_END_PLACE_Z = "endz";
     public static final String EXTRA_END_PLACE_NAME = "endPlaceName";
+    public static final String EXTRA_END_Point_BOOL = "endPoint";
     private ArrayList<Point> mPointList;
     private EditText mStartPlace, mEndPlace;
     private String mEndPlaceString;
@@ -47,7 +49,7 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.search_fragment, container, false);
         mStartPlace = (EditText) view.findViewById(R.id.start_place);
         mStartPlace.setText(R.string.myPlace);
@@ -84,6 +86,9 @@ public class SearchFragment extends Fragment {
                 intent.putExtra(EXTRA_START_PLACE_X, startPointX);
                 intent.putExtra(EXTRA_START_PLACE_Y, startPointY);
                 intent.putExtra(EXTRA_START_PLACE_Z, startPointZ);
+                intent.putExtra(EXTRA_END_Point_BOOL, false);
+                getActivity().setResult(Activity.RESULT_OK, intent);
+                getActivity().finish();  //finished这个activity
                 startActivity(intent);
             }
         });

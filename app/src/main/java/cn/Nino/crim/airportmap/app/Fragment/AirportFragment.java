@@ -33,8 +33,8 @@ public class AirportFragment extends Fragment {
     private Point endPoint = null;
     private Point startPoint = null;
     private String startPointAndendPoint;
+    Boolean notHaveEndPoint = true;
     ArrayList<Point> mPoints;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +43,7 @@ public class AirportFragment extends Fragment {
         double endPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
         double endPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
         double endPointZ = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
+        notHaveEndPoint = getActivity().getIntent().getBooleanExtra(SearchFragment.EXTRA_END_Point_BOOL, true);
         endPoint = new Point(name, endPointX, endPointY, endPointZ);
 
         double startPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_X, 0);
@@ -64,6 +65,8 @@ public class AirportFragment extends Fragment {
         mImageButtonLocation = (ImageButton) view.findViewById(R.id.location_button);
         mImageButtonSearch = (ImageButton) view.findViewById(R.id.search_place_button);
 
+        new NetTask().execute();
+
         mZoomControls.setOnZoomInClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,11 +87,6 @@ public class AirportFragment extends Fragment {
                 new NetTask().execute();
                 refurbishHandler.removeCallbacks(runnable);
                 refurbishHandler.postDelayed(runnable, 1000);  // 定时刷新任务
-                Log.e(TAG,
-                        "name:" + endPoint.getmTittle()
-                                + "  x:" + String.valueOf(endPoint.getPointX())
-                                + "  y:" + String.valueOf(endPoint.getPointY())
-                                + "  z:" + String.valueOf(endPoint.getPointZ()));
             }
         });
         mImageButtonSearch.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +99,7 @@ public class AirportFragment extends Fragment {
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_Y, String.valueOf(startPoint.getPointY()));
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_Z, String.valueOf(startPoint.getPointZ()));
                 startActivityForResult(intent, SEARCH_CODE);
+                getActivity().finish();
             }
         });
 
@@ -135,16 +134,10 @@ public class AirportFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        refurbishHandler.removeCallbacks(runnable);
-    }
-
     private class NetTask extends AsyncTask<Void, Void, ArrayList<Point>> {
         @Override
         protected ArrayList<Point> doInBackground(Void... params) {
-            if (endPoint.getmTittle() == null) {
+            if (notHaveEndPoint) {
                 return new NetConnection().getPoint();
             } else {
                 initMap();
@@ -155,8 +148,8 @@ public class AirportFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Point> points) {
             mPoints = points;
-            if (mPoints.size() == 1) {
-                saveStartPoint(points);
+            if (notHaveEndPoint) {
+                startPoint = points.get(0);
                 Log.e(TAG, "  x:" + String.valueOf(startPoint.getPointX())
                         + "  y:" + String.valueOf(startPoint.getPointY())
                         + "  z:" + String.valueOf(startPoint.getPointZ()));
@@ -164,15 +157,11 @@ public class AirportFragment extends Fragment {
                 MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
                 MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
             } else {
+                mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
+                MapInSize.getMapActivity().cleanPoint();
                 MapInSize.getMapActivity().redrawLine(mPoints);
+                // notHaveEndPoint = true;
             }
-        }
-
-        @Override
-        protected void onCancelled(ArrayList<Point> points) {
-            startPoint.setPointX(points.get(0).getPointX());
-            startPoint.setPointY(points.get(0).getPointY());
-            startPoint.setPointZ(points.get(0).getPointZ());
         }
     }
 
@@ -192,10 +181,26 @@ public class AirportFragment extends Fragment {
         }
     }
 
-    private Point saveStartPoint(ArrayList<Point> points) {
-        startPoint.setPointX(points.get(0).getPointX());
-        startPoint.setPointY(points.get(0).getPointY());
-        startPoint.setPointZ(points.get(0).getPointZ());
-        return startPoint;
+    /**
+     * 暂时没用到这个方法，因为用到这个方法后定位还需要再点击一次 待解决
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SEARCH_CODE) {
+            String name = data.getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
+            double endPointX = data.getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
+            double endPointY = data.getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
+            double endPointZ = data.getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
+            double startPointX = data.getDoubleExtra(SearchFragment.EXTRA_START_PLACE_X, 0);
+            double startPointY = data.getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Y, 0);
+            double startPointZ = data.getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Z, 0);
+            notHaveEndPoint = data.getBooleanExtra(SearchFragment.EXTRA_END_Point_BOOL, true);
+            startPoint = new Point("startPoint", startPointX, startPointY, startPointZ);
+            endPoint = new Point(name, endPointX, endPointY, endPointZ);
+        }
     }
 }
