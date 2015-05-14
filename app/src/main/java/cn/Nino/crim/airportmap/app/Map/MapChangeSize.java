@@ -12,6 +12,7 @@ import cn.Nino.crim.airportmap.app.R;
 /**
  * Created by Administrator on 2015/3/30 0030.
  * 可以放大缩小图片
+ * 这个版本暂时不用
  */
 public class MapChangeSize extends SurfaceView implements
         SurfaceHolder.Callback, View.OnTouchListener {
