@@ -8,9 +8,12 @@
     <string name="B1">B1</string>
     <string name="F1">F1</string>
     <string name="F2">F2</string>
-    <string name="navigation">导航</string>
+    <string name="navigation">开始导航</string>
+    <string name="find_mid_place">寻找中点</string>
     <string name="start_place">起点位置:</string>
     <string name="end_place">终点位置:</string>
+    <string name="middle_place">中点位置:</string>
+    <string name="middle_place_text">默认为空值</string>
     <string name="myPlace">我的位置</string>
 
 </resources>

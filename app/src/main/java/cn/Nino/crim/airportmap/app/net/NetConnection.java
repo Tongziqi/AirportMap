@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Administrator on 2015/4/3 0003.
@@ -85,13 +86,13 @@ public class NetConnection {
                 .appendQueryParameter("action", Path)
                 .appendQueryParameter("Points", nativePoints)
                 .build().toString();
-        //return downloadPoint(url);
         ArrayList<Point> points = new ArrayList<Point>();
         try {
             String pointString = getUrl(url);
             String pointStringUrlPoint = getUrl(urlPoint);
             String test = pointStringUrlPoint + "," + pointString;
             String array[] = test.split(",");
+            Log.e("MapActivity", Arrays.toString(array));
 
             for (int i = 0; i < array.length; ) {
                 Point item = new Point();

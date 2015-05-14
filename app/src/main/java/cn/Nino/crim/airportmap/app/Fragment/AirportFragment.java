@@ -23,7 +23,7 @@ import java.util.ArrayList;
  * Created by Administrator on 2015/3/26 0026.
  */
 public class AirportFragment extends Fragment {
-    public static final String TAG = "MapActivity";
+    public static final String TAG = " ";
     public static final int SEARCH_CODE = 1;
     private ZoomControls mZoomControls;
     private Button mButtonB1, mButtonF1, mButtonF2;
@@ -66,6 +66,8 @@ public class AirportFragment extends Fragment {
         mImageButtonSearch = (ImageButton) view.findViewById(R.id.search_place_button);
 
         new NetTask().execute();
+        refurbishHandler.removeCallbacks(runnable);
+        refurbishHandler.postDelayed(runnable, 1000);  // 定时刷新任务
 
         mZoomControls.setOnZoomInClickListener(new View.OnClickListener() {
             @Override
@@ -157,10 +159,10 @@ public class AirportFragment extends Fragment {
                 MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
                 MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
             } else {
+                startPoint = points.get(0);
                 mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
                 MapInSize.getMapActivity().cleanPoint();
                 MapInSize.getMapActivity().redrawLine(mPoints);
-                // notHaveEndPoint = true;
             }
         }
     }
@@ -179,6 +181,18 @@ public class AirportFragment extends Fragment {
             startPointAndendPoint = startPointString + "/" + endPointString;
             Log.e(TAG, startPointAndendPoint);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        refurbishHandler.removeCallbacks(runnable);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        refurbishHandler.removeCallbacks(runnable);
     }
 
     /**

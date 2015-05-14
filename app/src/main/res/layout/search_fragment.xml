@@ -47,17 +47,38 @@
                         android:ems="7"
                         android:id="@+id/end_place"/>
             </LinearLayout>
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                <TextView android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:textAppearance="?android:attr/textAppearanceSmall"
+                          android:text="@string/middle_place"
+                          android:id="@+id/textView"/>
+                <EditText android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:inputType="textPostalAddress"
+                          android:ems="7"
+                          android:id="@+id/mid_place"/>
+            </LinearLayout>
         </LinearLayout>
         <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" android:layout_gravity="right">
+                android:layout_height="match_parent"
+                android:layout_gravity="right">
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/navigation"
                     android:id="@+id/navigation_button"
-                    android:layout_gravity="left|center_vertical"/>
+                    android:layout_gravity="center_vertical"/>
+            <Button android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/find_mid_place"
+                    android:id="@+id/find_mid_place"
+                    android:layout_gravity="center_vertical"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout

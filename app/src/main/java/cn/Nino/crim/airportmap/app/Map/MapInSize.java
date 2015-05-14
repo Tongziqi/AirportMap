@@ -75,36 +75,46 @@ public class MapInSize extends SurfaceView {
     public void redrawLine(ArrayList<cn.Nino.crim.airportmap.app.Point.Point> points) {
         double pointX = points.get(0).getPointX();
         double pointY = points.get(0).getPointY();
+        double pointEndX = points.get(points.size() - 1).getPointX();
+        double pointEndY = points.get(points.size() - 1).getPointY();
         Canvas mCanvas = mHolder.lockCanvas();
         Paint mPaint = new Paint();
         mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
-        mPaint.setColor(Color.RED);
+        mPaint.setColor(Color.GREEN);
         mPaint.setDither(true);
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(7);
-        Shader mShader = new LinearGradient(0, 0, 20, 20,
+
+/*        Shader mShader = new LinearGradient(0, 0, 20, 20,
                 new int[]{
                         Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW},
                 null, Shader.TileMode.REPEAT);
-        mPaint.setShader(mShader);
+        mPaint.setShader(mShader);*/
 
-        Paint mPaintCircle = new Paint();
-        mPaintCircle.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
-        mPaintCircle.setColor(Color.RED);
+        Paint mPaintCircleStart = new Paint();
+        mPaintCircleStart.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
+        mPaintCircleStart.setColor(Color.RED);
+        Paint mPaintCircleEnd = new Paint();
+        mPaintCircleEnd.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
+        mPaintCircleEnd.setColor(Color.BLUE);
 
         for (int i = 0; i < points.size() - 1; i++) {
             checkFloorZ(points.get(i).getPointZ());
             if (points.get(i).getPointZ() != 0.0 && points.get(i + 1).getPointZ() != 0.0) {
-                mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaintCircle);
+                mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaintCircleStart);
                 mCanvas.drawLine((float) (points.get(i).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i).getPointY())),
                         (float) (points.get(i + 1).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i + 1).getPointY())), mPaint);
+                mCanvas.drawCircle((float) (getMap_x() * pointEndX), (float) (getMap_y() * (1 - pointEndY)), 10, mPaintCircleEnd);
+
+
             } else if (points.get(i).getPointY() > 0.38 || points.get(i + 1).getPointY() > 0.38) {
                 Toast.makeText(getContext().getApplicationContext(), "对不起已经超出范围", Toast.LENGTH_SHORT).show();
             } else {
-                mCanvas.drawCircle((float) (getMap_x() * pointX), (float) ((getMap_y() * (1 - pointY / 0.38))), 10, mPaintCircle);
+                mCanvas.drawCircle((float) (getMap_x() * pointX), (float) ((getMap_y() * (1 - pointY / 0.38))), 10, mPaintCircleStart);
                 mCanvas.drawLine((float) (points.get(i).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i).getPointY() / 0.38)),
                         (float) (points.get(i + 1).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i + 1).getPointY() / 0.38)), mPaint);
+                mCanvas.drawCircle((float) (getMap_x() * pointEndX), (float) ((getMap_y() * (1 - pointEndY / 0.38))), 10, mPaintCircleEnd);
             }
         }
         mHolder.unlockCanvasAndPost(mCanvas);
