@@ -38,6 +38,7 @@ public class AirportFragment extends Fragment {
     private String startPointAndMidPoint;
     private String midPointAndEndPoint;
     Boolean notHaveEndPoint = true;
+    Boolean hadStepIntoMidPoint = false;
     ArrayList<Point> mPoints;
 
     @Override
@@ -184,8 +185,12 @@ public class AirportFragment extends Fragment {
     };
 
     private void initMap() {
-        if (midPoint.getPointX() == 0.0 && midPoint.getPointY() == 0.0 && midPoint.getPointZ() == 0.0) {
+        if (midPoint.getPointX() == 0.0 && midPoint.getPointY() == 0.0
+                && midPoint.getPointZ() == 0.0 || judgeMidPoint(startPoint, midPoint)) {
             if (startPoint != null && endPoint != null) {
+                midPoint.setPointX(0.0);
+                midPoint.setPointY(0.0);
+                midPoint.setPointZ(0.0);  //这样写是因为走过中间点后，就把中间点变成0
                 String startPointString = startPoint.getPointString(startPoint);
                 String endPointString = endPoint.getPointString(endPoint);
                 startPointAndEndPoint = startPointString + "/" + endPointString;
@@ -200,6 +205,17 @@ public class AirportFragment extends Fragment {
             midPointAndEndPoint = midPointString + "/" + endPointString;
             Log.e(TAG, startPointAndMidPoint + "和" + midPointAndEndPoint);
         }
+    }
+
+    private boolean judgeMidPoint(Point startPoint, Point midPoint) {
+        double startPointX = startPoint.getPointX();
+        double startPointY = startPoint.getPointY();
+        double midPointX = midPoint.getPointX();
+        double midPointY = midPoint.getPointY();
+        hadStepIntoMidPoint = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05;
+
+        return hadStepIntoMidPoint;
+
     }
 
     @Override
