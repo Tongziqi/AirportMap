@@ -78,7 +78,8 @@ public class NetConnection {
         return downloadPoint(url);
     }
 
-    public ArrayList<Point> getPathPoint(String nativePoints) {
+    public ArrayList<Point> getPathPoint(String nativePoints,boolean hasMidPoint) {
+        String test; //产生的路径
         String urlPoint = Uri.parse(SEVER_URL_OPEN).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
@@ -90,7 +91,12 @@ public class NetConnection {
         try {
             String pointString = getUrl(url);
             String pointStringUrlPoint = getUrl(urlPoint);
-            String test = pointStringUrlPoint + "," + pointString;
+
+            if (hasMidPoint) {
+                test = pointString;
+            } else {
+                test = pointStringUrlPoint + "," + pointString;
+            }
             String array[] = test.split(",");
             Log.e("MapActivity", Arrays.toString(array));
 

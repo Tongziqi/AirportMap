@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import cn.Nino.crim.airportmap.app.Activity.SearchActivity;
 import cn.Nino.crim.airportmap.app.Map.MapInSize;
 import cn.Nino.crim.airportmap.app.Point.Point;
@@ -25,26 +27,35 @@ import java.util.ArrayList;
 public class AirportFragment extends Fragment {
     public static final String TAG = " ";
     public static final int SEARCH_CODE = 1;
-    private ZoomControls mZoomControls;
     private Button mButtonB1, mButtonF1, mButtonF2;
     private ImageButton mImageButtonLocation, mImageButtonSearch;
     private EditText mThePlaceYouWantGo;
     private Handler refurbishHandler = new Handler();
     private Point endPoint = null;
     private Point startPoint = null;
-    private String startPointAndendPoint;
+    private Point midPoint = null;
+    private String startPointAndEndPoint;
+    private String startPointAndMidPoint;
+    private String midPointAndEndPoint;
     Boolean notHaveEndPoint = true;
     ArrayList<Point> mPoints;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String name = getActivity().getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
+        String endPointName = getActivity().getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
         double endPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
         double endPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
         double endPointZ = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
         notHaveEndPoint = getActivity().getIntent().getBooleanExtra(SearchFragment.EXTRA_END_Point_BOOL, true);
-        endPoint = new Point(name, endPointX, endPointY, endPointZ);
+        endPoint = new Point(endPointName, endPointX, endPointY, endPointZ);
+
+        String midPointName = getActivity().getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
+        double midPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_MID_PLACE_X, 0);
+        double midPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_MID_PLACE_Y, 0);
+        double midPointZ = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_MID_PLACE_Z, 0);
+        midPoint = new Point(midPointName, midPointX, midPointY, midPointZ);
+
 
         double startPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_X, 0);
         double startPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Y, 0);
@@ -56,7 +67,6 @@ public class AirportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.airport_fragemnt, container, false);
-        mZoomControls = (ZoomControls) view.findViewById(R.id.zoomControls);
         mButtonB1 = (Button) view.findViewById(R.id.button_b1);
         mButtonF1 = (Button) view.findViewById(R.id.button_f1);
         mButtonF2 = (Button) view.findViewById(R.id.button_f2);
@@ -68,20 +78,6 @@ public class AirportFragment extends Fragment {
         new NetTask().execute();
         refurbishHandler.removeCallbacks(runnable);
         refurbishHandler.postDelayed(runnable, 1000);  // 定时刷新任务
-
-        mZoomControls.setOnZoomInClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity(), "放大图片", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mZoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getActivity(), "缩小图片", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +139,20 @@ public class AirportFragment extends Fragment {
                 return new NetConnection().getPoint();
             } else {
                 initMap();
-                return new NetConnection().getPathPoint(startPointAndendPoint);
+                ArrayList<Point> points = new ArrayList<Point>();
+
+                if (startPointAndEndPoint == null) {
+                    ArrayList<Point> pointsStartAndMid = new NetConnection().getPathPoint(startPointAndMidPoint, false);
+                    ArrayList<Point> pointsMidAndEnd = new NetConnection().getPathPoint(midPointAndEndPoint, true);
+
+                    points.addAll(pointsStartAndMid);
+                    points.addAll(pointsMidAndEnd);
+
+                } else {
+                    points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
+                }
+
+                return points;
             }
         }
 
@@ -175,11 +184,21 @@ public class AirportFragment extends Fragment {
     };
 
     private void initMap() {
-        if (startPoint != null && endPoint != null) {
+        if (midPoint.getPointX() == 0.0 && midPoint.getPointY() == 0.0 && midPoint.getPointZ() == 0.0) {
+            if (startPoint != null && endPoint != null) {
+                String startPointString = startPoint.getPointString(startPoint);
+                String endPointString = endPoint.getPointString(endPoint);
+                startPointAndEndPoint = startPointString + "/" + endPointString;
+                Log.e(TAG, startPointAndEndPoint);
+            }
+        } else {
             String startPointString = startPoint.getPointString(startPoint);
+            String midPointString = midPoint.getPointString(midPoint);
             String endPointString = endPoint.getPointString(endPoint);
-            startPointAndendPoint = startPointString + "/" + endPointString;
-            Log.e(TAG, startPointAndendPoint);
+            startPointAndEndPoint = null;
+            startPointAndMidPoint = startPointString + "/" + midPointString;
+            midPointAndEndPoint = midPointString + "/" + endPointString;
+            Log.e(TAG, startPointAndMidPoint + "和" + midPointAndEndPoint);
         }
     }
 

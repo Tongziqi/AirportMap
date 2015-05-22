@@ -15,5 +15,7 @@
     <string name="middle_place">中点位置:</string>
     <string name="middle_place_text">默认为空值</string>
     <string name="myPlace">我的位置</string>
+    <string name="confirm_mid_place">确定中点</string>
+    <string name="middle_place_you_want_to_go">请输入想去的中点</string>
 
 </resources>

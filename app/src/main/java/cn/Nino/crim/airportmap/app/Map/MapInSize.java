@@ -86,11 +86,6 @@ public class MapInSize extends SurfaceView {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(7);
 
-/*        Shader mShader = new LinearGradient(0, 0, 20, 20,
-                new int[]{
-                        Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW},
-                null, Shader.TileMode.REPEAT);
-        mPaint.setShader(mShader);*/
 
         Paint mPaintCircleStart = new Paint();
         mPaintCircleStart.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次

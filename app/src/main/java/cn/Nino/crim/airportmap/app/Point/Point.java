@@ -18,8 +18,8 @@ public class Point {
 
     public Point() {
         mTittle = "test";
-        pointX = 0.1;
-        pointY = 0.1;
+        pointX = 0.0;
+        pointY = 0.0;
         pointZ = 0.0;
     }
 
