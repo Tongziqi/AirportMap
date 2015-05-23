@@ -13,8 +13,8 @@ public class PointLab {
     private static PointLab sPointLab;
     private Context mContext;
 
-    DefaultPointB1 defaultPointB1 = new DefaultPointB1();
-    ArrayList<Point> defaultB1Points = defaultPointB1.initialPointB1();
+    DefaultPoint defaultPoint = new DefaultPoint();
+    ArrayList<Point> defaultB1Points = defaultPoint.initialPoint();
 
 
     public PointLab(Context mContext, String mThePlaceYouWantGo) {

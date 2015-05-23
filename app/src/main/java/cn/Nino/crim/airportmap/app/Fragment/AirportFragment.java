@@ -1,5 +1,6 @@
 package cn.Nino.crim.airportmap.app.Fragment;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -169,6 +170,10 @@ public class AirportFragment extends Fragment {
                 MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
                 MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
             } else {
+                if (hadStepIntoMidPoint) {
+                    new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("懂得", null).show();
+                    hadStepIntoMidPoint = false;
+                }
                 startPoint = points.get(0);
                 mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
                 MapInSize.getMapActivity().cleanPoint();
@@ -213,7 +218,6 @@ public class AirportFragment extends Fragment {
         double midPointX = midPoint.getPointX();
         double midPointY = midPoint.getPointY();
         hadStepIntoMidPoint = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05;
-
         return hadStepIntoMidPoint;
 
     }
