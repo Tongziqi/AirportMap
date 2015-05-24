@@ -28,6 +28,7 @@ import java.util.ArrayList;
 public class AirportFragment extends Fragment {
     public static final String TAG = " ";
     public static final int SEARCH_CODE = 1;
+    private int firstStepDrawLines = 1;
     private Button mButtonB1, mButtonF1, mButtonF2;
     private ImageButton mImageButtonLocation, mImageButtonSearch;
     private EditText mThePlaceYouWantGo;
@@ -40,6 +41,7 @@ public class AirportFragment extends Fragment {
     private String midPointAndEndPoint;
     Boolean notHaveEndPoint = true;
     Boolean hadStepIntoMidPoint = false;
+    Boolean youDonnotMove = false;
     ArrayList<Point> mPoints;
 
     @Override
@@ -79,14 +81,14 @@ public class AirportFragment extends Fragment {
 
         new NetTask().execute();
         refurbishHandler.removeCallbacks(runnable);
-        refurbishHandler.postDelayed(runnable, 1000);  // 定时刷新任务
+        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务
 
         mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new NetTask().execute();
                 refurbishHandler.removeCallbacks(runnable);
-                refurbishHandler.postDelayed(runnable, 1000);  // 定时刷新任务
+                refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务
             }
         });
         mImageButtonSearch.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +101,7 @@ public class AirportFragment extends Fragment {
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_Y, String.valueOf(startPoint.getPointY()));
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_Z, String.valueOf(startPoint.getPointZ()));
                 startActivityForResult(intent, SEARCH_CODE);
+                firstStepDrawLines = 1; //每次搜索的时候把firstStepDrawLines参数设置为1，就可以保证画一次路径
                 getActivity().finish();
             }
         });
@@ -162,30 +165,45 @@ public class AirportFragment extends Fragment {
         protected void onPostExecute(ArrayList<Point> points) {
             mPoints = points;
             if (notHaveEndPoint) {
-                startPoint = points.get(0);
-                Log.e(TAG, "  x:" + String.valueOf(startPoint.getPointX())
-                        + "  y:" + String.valueOf(startPoint.getPointY())
-                        + "  z:" + String.valueOf(startPoint.getPointZ()));
-                MapInSize.getMapActivity().cleanPoint();
-                MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
-                MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
-            } else {
-                if (hadStepIntoMidPoint) {
-                    new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("懂得", null).show();
-                    hadStepIntoMidPoint = false;
+                if (whetherYouMove(startPoint, points.get(0))) {
+                    Log.e(TAG, "并没有走动");
+                } else {
+                    startPoint = points.get(0);
+                    Log.e(TAG, "  x:" + String.valueOf(startPoint.getPointX())
+                            + "  y:" + String.valueOf(startPoint.getPointY())
+                            + "  z:" + String.valueOf(startPoint.getPointZ()));
+                    MapInSize.getMapActivity().cleanPoint();
+                    MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
+                    MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
                 }
-                startPoint = points.get(0);
-                mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
-                MapInSize.getMapActivity().cleanPoint();
-                MapInSize.getMapActivity().redrawLine(mPoints);
+            } else {
+                if (firstStepDrawLines >= 1) {
+                    startPoint = points.get(0);
+                    mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
+                    MapInSize.getMapActivity().cleanPoint();
+                    MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
+                    MapInSize.getMapActivity().redrawLine(mPoints);
+                    firstStepDrawLines--;
+                }
+                if (!whetherYouMove(startPoint, points.get(0))) {
+                    if (hadStepIntoMidPoint) {
+                        new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("懂得", null).show();
+                        hadStepIntoMidPoint = false;
+                    }
+                    startPoint = points.get(0);
+                    //mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
+                    MapInSize.getMapActivity().cleanPoint();
+                    MapInSize.getMapActivity().redrawLine(mPoints);
+                }
             }
         }
+
     }
 
     private Runnable runnable = new Runnable() {
         public void run() {
             new NetTask().execute();
-            refurbishHandler.postDelayed(this, 1000);
+            refurbishHandler.postDelayed(this, 20);
         }
     };
 
@@ -222,6 +240,13 @@ public class AirportFragment extends Fragment {
 
     }
 
+    private boolean whetherYouMove(Point startPoint, Point endPoint) {
+        youDonnotMove = ((startPoint.getPointX() == endPoint.getPointX() &&  //如果相等 则没有移动 youDonnotMove为真
+                startPoint.getPointY() == endPoint.getPointY() &&
+                startPoint.getPointZ() == endPoint.getPointZ()));
+        return youDonnotMove;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -237,9 +262,9 @@ public class AirportFragment extends Fragment {
     /**
      * 暂时没用到这个方法，因为用到这个方法后定位还需要再点击一次 待解决
      *
-     * @param requestCode
-     * @param resultCode
-     * @param data
+     * @param requestCode requestCode
+     * @param resultCode  resultCode
+     * @param data        传递的数据
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
