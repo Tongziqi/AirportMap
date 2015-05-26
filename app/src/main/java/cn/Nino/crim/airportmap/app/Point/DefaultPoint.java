@@ -3,6 +3,7 @@ package cn.Nino.crim.airportmap.app.Point;
 import java.util.ArrayList;
 
 /**
+ * 默认的类
  * Created by Administrator on 2015/4/13 0013.
  */
 public class DefaultPoint {
@@ -17,9 +18,9 @@ public class DefaultPoint {
     public ArrayList<Point> initialPoint() {
         allPoints.add(new Point("ES1", 0.11, 0.1, 0.0));
         allPoints.add(new Point("EL1", 0.17, 0.05, 0.0));
-        allPoints.add(new Point("D1", 0.27, 0.05, 0.0));
-        allPoints.add(new Point("D2", 0.5, 0.05, 0.0));
-        allPoints.add(new Point("D3", 0.73, 0.05, 0.0));
+        allPoints.add(new Point("地下一层D1", 0.27, 0.05, 0.0));
+        allPoints.add(new Point("地下一层D1D2", 0.5, 0.05, 0.0));
+        allPoints.add(new Point("地下一层D1D3", 0.73, 0.05, 0.0));
         allPoints.add(new Point("EL2", 0.83, 0.05, 0.0));
         allPoints.add(new Point("ES2", 0.87, 0.1, 0.0));
         allPoints.add(new Point("EL3", 0.26, 0.37, 0.0));
@@ -61,13 +62,13 @@ public class DefaultPoint {
         allPoints.add(new Point("W1", 0.0681, 0.0707, 1.0));
         allPoints.add(new Point("ES1", 0.1220, 0.0900, 1.0));
         allPoints.add(new Point("EL1", 0.1393, 0.0553, 1.0));
-        allPoints.add(new Point("D1", 0.2606, 0.0419, 1.0));
+        allPoints.add(new Point("第一层D1", 0.2606, 0.0419, 1.0));
         allPoints.add(new Point("S1", 0.3606, 0.0746, 1.0));
         allPoints.add(new Point("S2", 0.4010, 0.0746, 1.0));
-        allPoints.add(new Point("D2", 0.4992, 0.0419, 1.0));
+        allPoints.add(new Point("第一层D2", 0.4992, 0.0419, 1.0));
         allPoints.add(new Point("S3", 0.5993, 0.0746, 1.0));
         allPoints.add(new Point("S4", 0.6339, 0.0746, 1.0));
-        allPoints.add(new Point("D3", 0.7378, 0.0361, 1.0));
+        allPoints.add(new Point("第一层D3", 0.7378, 0.0361, 1.0));
         allPoints.add(new Point("EL2", 0.8552, 0.0553, 1.0));
         allPoints.add(new Point("ES2", 0.8764, 0.0900, 1.0));
         allPoints.add(new Point("W2", 0.9302, 0.0707, 1.0));
@@ -243,13 +244,13 @@ public class DefaultPoint {
         allPoints.add(new Point("W1", 0.0681, 0.0707, 2.0));
         allPoints.add(new Point("ES1", 0.1220, 0.0900, 2.0));
         allPoints.add(new Point("EL1", 0.1393, 0.0553, 2.0));
-        allPoints.add(new Point("D1", 0.2606, 0.0419, 2.0));
+        allPoints.add(new Point("第二层D1", 0.2606, 0.0419, 2.0));
         allPoints.add(new Point("S1", 0.3606, 0.0746, 2.0));
         allPoints.add(new Point("S2", 0.4010, 0.0746, 2.0));
-        allPoints.add(new Point("D2", 0.4953, 0.0419, 2.0));
+        allPoints.add(new Point("第二层D2", 0.4953, 0.0419, 2.0));
         allPoints.add(new Point("S3", 0.5993, 0.0746, 2.0));
         allPoints.add(new Point("S4", 0.6339, 0.0746, 2.0));
-        allPoints.add(new Point("D3", 0.7378, 0.0361, 2.0));
+        allPoints.add(new Point("第二层D3", 0.7378, 0.0361, 2.0));
         allPoints.add(new Point("EL2", 0.8552, 0.0553, 2.0));
         allPoints.add(new Point("ES2", 0.8764, 0.0900, 2.0));
         allPoints.add(new Point("W2", 0.9302, 0.0707, 2.0));
