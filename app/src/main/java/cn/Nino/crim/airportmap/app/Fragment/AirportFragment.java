@@ -81,14 +81,14 @@ public class AirportFragment extends Fragment {
 
         new NetTask().execute();
         refurbishHandler.removeCallbacks(runnable);
-        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务
+        refurbishHandler.postDelayed(runnable, 100);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
 
         mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new NetTask().execute();
                 refurbishHandler.removeCallbacks(runnable);
-                refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务
+                refurbishHandler.postDelayed(runnable, 100);  // 定时刷新任务
             }
         });
         mImageButtonSearch.setOnClickListener(new View.OnClickListener() {
@@ -169,9 +169,9 @@ public class AirportFragment extends Fragment {
                     Log.e(TAG, "并没有走动");
                 } else {
                     startPoint = points.get(0);
-                    Log.e(TAG, "  x:" + String.valueOf(startPoint.getPointX())
+/*                    Log.e(TAG, "  x:" + String.valueOf(startPoint.getPointX())
                             + "  y:" + String.valueOf(startPoint.getPointY())
-                            + "  z:" + String.valueOf(startPoint.getPointZ()));
+                            + "  z:" + String.valueOf(startPoint.getPointZ()));*/
                     MapInSize.getMapActivity().cleanPoint();
                     MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
                     MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
@@ -181,8 +181,9 @@ public class AirportFragment extends Fragment {
                     startPoint = points.get(0);
                     mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
                     MapInSize.getMapActivity().cleanPoint();
-                    MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
-                    MapInSize.getMapActivity().redrawLine(mPoints);
+
+                    MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
+                    MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
                     firstStepDrawLines--;
                 }
                 if (!whetherYouMove(startPoint, points.get(0))) {
@@ -191,9 +192,12 @@ public class AirportFragment extends Fragment {
                         hadStepIntoMidPoint = false;
                     }
                     startPoint = points.get(0);
-                    //mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
                     MapInSize.getMapActivity().cleanPoint();
-                    MapInSize.getMapActivity().redrawLine(mPoints);
+                    Log.e(TAG, divideLayePoint(points).toString());
+
+                    MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
+                    MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+
                 }
             }
         }
@@ -203,7 +207,7 @@ public class AirportFragment extends Fragment {
     private Runnable runnable = new Runnable() {
         public void run() {
             new NetTask().execute();
-            refurbishHandler.postDelayed(this, 20);
+            refurbishHandler.postDelayed(this, 100);
         }
     };
 
@@ -217,7 +221,6 @@ public class AirportFragment extends Fragment {
                 String startPointString = startPoint.getPointString(startPoint);
                 String endPointString = endPoint.getPointString(endPoint);
                 startPointAndEndPoint = startPointString + "/" + endPointString;
-                Log.e(TAG, startPointAndEndPoint);
             }
         } else {
             String startPointString = startPoint.getPointString(startPoint);
@@ -226,7 +229,6 @@ public class AirportFragment extends Fragment {
             startPointAndEndPoint = null;
             startPointAndMidPoint = startPointString + "/" + midPointString;
             midPointAndEndPoint = midPointString + "/" + endPointString;
-            Log.e(TAG, startPointAndMidPoint + "和" + midPointAndEndPoint);
         }
     }
 
@@ -239,6 +241,21 @@ public class AirportFragment extends Fragment {
         return hadStepIntoMidPoint;
 
     }
+
+
+    private ArrayList<Point> divideLayePoint(ArrayList<Point> points) { //得到第一层的点
+        ArrayList<Point> firstListPoints = new ArrayList<Point>();
+        firstListPoints.add(points.get(0));
+        for (int i = 1; i < points.size(); i++) {
+            if (points.get(i).getPointZ() == points.get(i - 1).getPointZ()) {
+                firstListPoints.add(points.get(i));
+            } else {
+                return firstListPoints;
+            }
+        }
+        return firstListPoints;
+    }
+
 
     private boolean whetherYouMove(Point startPoint, Point endPoint) {
         youDonnotMove = ((startPoint.getPointX() == endPoint.getPointX() &&  //如果相等 则没有移动 youDonnotMove为真
