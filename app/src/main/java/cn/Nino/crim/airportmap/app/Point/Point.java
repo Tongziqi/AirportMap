@@ -58,7 +58,11 @@ public class Point {
 
     @Override
     public String toString() {
-        return mTittle;
+        return "Point{" +
+                "pointX=" + pointX +
+                ", pointY=" + pointY +
+                ", pointZ=" + pointZ +
+                '}';
     }
 
     public String getPointString(Point point) {

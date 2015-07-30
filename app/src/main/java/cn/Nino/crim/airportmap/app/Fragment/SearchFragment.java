@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +54,6 @@ public class SearchFragment extends Fragment {
         startPointX = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_X));
         startPointY = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_Y));
         startPointZ = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_Z));
-        Toast.makeText(getActivity(), mEndPlaceString + startPointX + startPointY + startPointZ, Toast.LENGTH_SHORT).show();
 
         midPoint = new Point("test", 0.0, 0.0, 0.0);
         mPointList = PointLab.getmPointLab(getActivity(), mEndPlaceString).getmPointList();
@@ -130,7 +128,6 @@ public class SearchFragment extends Fragment {
                 }
                 navigationButton.setEnabled(true);
                 middlePlaceButton.setEnabled(true);
-                Toast.makeText(getActivity().getApplicationContext(), mPointList.get(position).getmTittle(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -142,7 +139,7 @@ public class SearchFragment extends Fragment {
                 hasmid = true;
                 arrayAdapter.notifyDataSetChanged();
                 listView.setAdapter(arrayAdapter);
-                Log.e("新的List", String.valueOf(mPointList));
+                //Log.e("新的List", String.valueOf(mPointList));
             }
         });
         arrayAdapter.notifyDataSetChanged();
@@ -164,7 +161,7 @@ public class SearchFragment extends Fragment {
                 intent.putExtra(EXTRA_START_PLACE_X, startPointX);
                 intent.putExtra(EXTRA_START_PLACE_Y, startPointY);
                 intent.putExtra(EXTRA_START_PLACE_Z, startPointZ);
-                intent.putExtra(EXTRA_END_Point_BOOL, false);
+                intent.putExtra(EXTRA_END_Point_BOOL, false);  //这里面改变notHaveEndPoint里面的值
                 getActivity().setResult(Activity.RESULT_OK, intent);
                 getActivity().finish();  //finished这个activity
                 startActivity(intent);

@@ -94,7 +94,7 @@ public class MapInSize extends SurfaceView {
         mPaintCircleEnd.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
         mPaintCircleEnd.setColor(Color.BLUE);
 
-        for (int i = 0; i < points.size() - 1; i++) {
+        for (int i = 1; i < points.size() - 1; i++) {
             checkFloorZ(points.get(i).getPointZ());
             if (points.get(i).getPointZ() != 0.0 && points.get(i + 1).getPointZ() != 0.0) {
                 mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaintCircleStart);
@@ -122,7 +122,7 @@ public class MapInSize extends SurfaceView {
         Paint paint = new Paint();
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         mCanvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+       // paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         mHolder.unlockCanvasAndPost(mCanvas);
     }
 

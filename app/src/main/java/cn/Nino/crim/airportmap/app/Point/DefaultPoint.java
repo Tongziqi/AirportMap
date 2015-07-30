@@ -19,8 +19,8 @@ public class DefaultPoint {
         allPoints.add(new Point("ES1", 0.11, 0.1, 0.0));
         allPoints.add(new Point("EL1", 0.17, 0.05, 0.0));
         allPoints.add(new Point("地下一层D1", 0.27, 0.05, 0.0));
-        allPoints.add(new Point("地下一层D1D2", 0.5, 0.05, 0.0));
-        allPoints.add(new Point("地下一层D1D3", 0.73, 0.05, 0.0));
+        allPoints.add(new Point("地下一层D2", 0.5, 0.05, 0.0));
+        allPoints.add(new Point("地下一层D3", 0.73, 0.05, 0.0));
         allPoints.add(new Point("EL2", 0.83, 0.05, 0.0));
         allPoints.add(new Point("ES2", 0.87, 0.1, 0.0));
         allPoints.add(new Point("EL3", 0.26, 0.37, 0.0));

@@ -10,16 +10,16 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by Administrator on 2015/4/3 0003.
  */
 public class NetConnection {
     public static final String TAG = "AirporMap";
-    public static final String SEVER_URL_TEST = "http://172.18.4.184:8080/SecretWebSever/api.jsp";
+    public static final String SEVER_URL_TEST = "http://172.18.4.184:8080/Access";
     public static final String SEVER_URL_FORMAL = "http://172.18.4.166:8080/Access";
     public static final String SEVER_URL_OPEN = "http://172.21.14.44:8080/user/Access";
+    public static final String SEVER_URL_MOHANWEN = "http://10.18.16.223:8080/Access";
     public static final String ACTION_LOCATE = "locate";
     public static final String Test = "test";
     public static final String Path = "getPath";
@@ -72,7 +72,7 @@ public class NetConnection {
     }
 
     public ArrayList<Point> getPoint() {
-        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
+        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
         return downloadPoint(url);
@@ -80,10 +80,10 @@ public class NetConnection {
 
     public ArrayList<Point> getPathPoint(String nativePoints, boolean hasMidPoint) {
         String allPathString; //产生的路径
-        String urlPoint = Uri.parse(SEVER_URL_OPEN).buildUpon()
+        String urlPoint = Uri.parse(SEVER_URL_TEST).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
-        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
+        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
                 .appendQueryParameter("action", Path)
                 .appendQueryParameter("Points", nativePoints)
                 .build().toString();
@@ -93,12 +93,12 @@ public class NetConnection {
             String pointStringUrlPoint = getUrl(urlPoint);
 
             if (hasMidPoint) {
-                allPathString = pointString;
+                allPathString = pointString;    //不加开始节点
             } else {
-                allPathString = pointStringUrlPoint + "," + pointString;
+                allPathString = pointStringUrlPoint + "," + pointString; //这里面把开始节点加进去
             }
             String array[] = allPathString.split(",");
-            Log.e("MapActivity", Arrays.toString(array));
+           // Log.e("MapActivity", Arrays.toString(array));
 
             for (int i = 0; i < array.length; ) {
                 Point item = new Point();

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,9 +44,12 @@ public class AirportFragment extends Fragment {
     Boolean hadStepIntoMidPoint = false;
     Boolean youDonnotMove = false;
     ArrayList<Point> mPoints;
+    ArrayList<Point> pointArrayListLine = new ArrayList<Point>(); //存储得到的路径 保证不每次都重绘
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         String endPointName = getActivity().getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
         double endPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
@@ -79,18 +83,33 @@ public class AirportFragment extends Fragment {
         mImageButtonLocation = (ImageButton) view.findViewById(R.id.location_button);
         mImageButtonSearch = (ImageButton) view.findViewById(R.id.search_place_button);
 
-        new NetTask().execute();
-        refurbishHandler.removeCallbacks(runnable);
-        refurbishHandler.postDelayed(runnable, 100);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
 
-        mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
+        final Handler handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == 100) {
+                    pointArrayListLine = (ArrayList<Point>) msg.obj;
+                    Log.e("获得的路径:", pointArrayListLine.toString());
+                }
+            }
+        };
+
+        //定位是每秒都需要
+        //但是规划路径只需要特定的时候才需要
+        new NetTask(handler).execute();
+        refurbishHandler.removeCallbacks(runnable);
+        refurbishHandler.postDelayed(runnable, 50);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
+
+        //new NetGetPoint().execute();
+
+/*        mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new NetTask().execute();
+                new NetTask(refurbishHandler).execute();
                 refurbishHandler.removeCallbacks(runnable);
-                refurbishHandler.postDelayed(runnable, 100);  // 定时刷新任务
+                refurbishHandler.postDelayed(runnable, 50);  // 定时刷新任务
             }
-        });
+        });*/
         mImageButtonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,6 +157,12 @@ public class AirportFragment extends Fragment {
     }
 
     private class NetTask extends AsyncTask<Void, Void, ArrayList<Point>> {
+        private Handler handler;
+
+        private NetTask(Handler handler) {
+            this.handler = handler;
+        }
+
         @Override
         protected ArrayList<Point> doInBackground(Void... params) {
             if (notHaveEndPoint) {
@@ -145,18 +170,28 @@ public class AirportFragment extends Fragment {
             } else {
                 initMap();
                 ArrayList<Point> points = new ArrayList<Point>();
+                if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
+                    if (startPointAndEndPoint == null) {  //处理有没有中间点 这里面是有中间点
+                        ArrayList<Point> pointsStartAndMid = new NetConnection().getPathPoint(startPointAndMidPoint, false);
+                        ArrayList<Point> pointsMidAndEnd = new NetConnection().getPathPoint(midPointAndEndPoint, true);
 
-                if (startPointAndEndPoint == null) {
-                    ArrayList<Point> pointsStartAndMid = new NetConnection().getPathPoint(startPointAndMidPoint, false);
-                    ArrayList<Point> pointsMidAndEnd = new NetConnection().getPathPoint(midPointAndEndPoint, true);
+                        points.addAll(pointsStartAndMid);
+                        points.addAll(pointsMidAndEnd);
 
-                    points.addAll(pointsStartAndMid);
-                    points.addAll(pointsMidAndEnd);
-
-                } else {
-                    points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
+                    } else { //没有中间点
+                        points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
+                    }
+                    Message msg = new Message();
+                    msg.what = 100;
+                    msg.obj = points;
+                    handler.sendMessage(msg);  //把值传出去
                 }
-
+                if (pointArrayListLine.size() != 0) {
+                    ArrayList<Point> startPointsList = new ArrayList<Point>();
+                    startPointsList = new NetConnection().getPoint();
+                    pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
+                    points = pointArrayListLine;
+                }
                 return points;
             }
         }
@@ -165,13 +200,8 @@ public class AirportFragment extends Fragment {
         protected void onPostExecute(ArrayList<Point> points) {
             mPoints = points;
             if (notHaveEndPoint) {
-                if (whetherYouMove(startPoint, points.get(0))) {
-                    Log.e(TAG, "并没有走动");
-                } else {
+                if (!whetherYouMove(startPoint, points.get(0))) {
                     startPoint = points.get(0);
-/*                    Log.e(TAG, "  x:" + String.valueOf(startPoint.getPointX())
-                            + "  y:" + String.valueOf(startPoint.getPointY())
-                            + "  z:" + String.valueOf(startPoint.getPointZ()));*/
                     MapInSize.getMapActivity().cleanPoint();
                     MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
                     MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
@@ -179,25 +209,21 @@ public class AirportFragment extends Fragment {
             } else {
                 if (firstStepDrawLines >= 1) {
                     startPoint = points.get(0);
-                    mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle());
+                    mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle()); //就是从搜索界面返回的情形
                     MapInSize.getMapActivity().cleanPoint();
-
                     MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
                     MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
                     firstStepDrawLines--;
                 }
-                if (!whetherYouMove(startPoint, points.get(0))) {
+                if (!whetherYouMove(startPoint, points.get(0))) { //如果移动
                     if (hadStepIntoMidPoint) {
                         new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("懂得", null).show();
                         hadStepIntoMidPoint = false;
                     }
                     startPoint = points.get(0);
                     MapInSize.getMapActivity().cleanPoint();
-                    Log.e(TAG, divideLayePoint(points).toString());
-
                     MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
                     MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
-
                 }
             }
         }
@@ -206,8 +232,8 @@ public class AirportFragment extends Fragment {
 
     private Runnable runnable = new Runnable() {
         public void run() {
-            new NetTask().execute();
-            refurbishHandler.postDelayed(this, 100);
+            new NetTask(refurbishHandler).execute();
+            refurbishHandler.postDelayed(this, 50);
         }
     };
 
@@ -232,7 +258,7 @@ public class AirportFragment extends Fragment {
         }
     }
 
-    private boolean judgeMidPoint(Point startPoint, Point midPoint) {
+    private boolean judgeMidPoint(Point startPoint, Point midPoint) { //判断是否到中点
         double startPointX = startPoint.getPointX();
         double startPointY = startPoint.getPointY();
         double midPointX = midPoint.getPointX();
@@ -243,7 +269,7 @@ public class AirportFragment extends Fragment {
     }
 
 
-    private ArrayList<Point> divideLayePoint(ArrayList<Point> points) { //得到第一层的点
+    private ArrayList<Point> divideLayePoint(ArrayList<Point> points) { //得到第一层的点 // 每次都获得第一层的点
         ArrayList<Point> firstListPoints = new ArrayList<Point>();
         firstListPoints.add(points.get(0));
         for (int i = 1; i < points.size(); i++) {
