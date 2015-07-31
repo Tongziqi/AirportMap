@@ -1,10 +1,16 @@
 package cn.Nino.crim.airportmap.app.Activity;
 
 import android.app.Fragment;
-import android.widget.Toast;
+import android.os.Bundle;
 import cn.Nino.crim.airportmap.app.Fragment.AirportFragment;
 
 public class AirportActivity extends SingleFragmentActivity {
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     protected int mFinishClick = 0; //单击Back键的次数，设置成单击两次才退出
 
@@ -17,9 +23,11 @@ public class AirportActivity extends SingleFragmentActivity {
     public void finish() {
         mFinishClick++;
         if (mFinishClick == 1) {
-            Toast.makeText(this, "按两次退出键退出", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "按两次退出键退出", Toast.LENGTH_SHORT).show();
         } else if (mFinishClick == 2) {
             super.finish();
         }
     }
+
+
 }

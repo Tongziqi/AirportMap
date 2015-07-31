@@ -69,6 +69,7 @@ public class AirportFragment extends Fragment {
         double startPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Y, 0);
         double startPointZ = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Z, 0);
         startPoint = new Point("startPoint", startPointX, startPointY, startPointZ);
+
     }
 
     @Nullable
@@ -82,7 +83,6 @@ public class AirportFragment extends Fragment {
         mThePlaceYouWantGo.setText(R.string.search_place);
         mImageButtonLocation = (ImageButton) view.findViewById(R.id.location_button);
         mImageButtonSearch = (ImageButton) view.findViewById(R.id.search_place_button);
-
 
         final Handler handler = new Handler() {
             @Override
@@ -98,9 +98,8 @@ public class AirportFragment extends Fragment {
         //但是规划路径只需要特定的时候才需要
         new NetTask(handler).execute();
         refurbishHandler.removeCallbacks(runnable);
-        refurbishHandler.postDelayed(runnable, 50);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
+        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
 
-        //new NetGetPoint().execute();
 
 /*        mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,6 +120,7 @@ public class AirportFragment extends Fragment {
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_Z, String.valueOf(startPoint.getPointZ()));
                 startActivityForResult(intent, SEARCH_CODE);
                 firstStepDrawLines = 1; //每次搜索的时候把firstStepDrawLines参数设置为1，就可以保证画一次路径
+                getActivity().finish();
                 getActivity().finish();
             }
         });
@@ -300,28 +300,5 @@ public class AirportFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         refurbishHandler.removeCallbacks(runnable);
-    }
-
-    /**
-     * 暂时没用到这个方法，因为用到这个方法后定位还需要再点击一次 待解决
-     *
-     * @param requestCode requestCode
-     * @param resultCode  resultCode
-     * @param data        传递的数据
-     */
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SEARCH_CODE) {
-            String name = data.getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
-            double endPointX = data.getDoubleExtra(SearchFragment.EXTRA_END_PLACE_X, 0);
-            double endPointY = data.getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Y, 0);
-            double endPointZ = data.getDoubleExtra(SearchFragment.EXTRA_END_PLACE_Z, 0);
-            double startPointX = data.getDoubleExtra(SearchFragment.EXTRA_START_PLACE_X, 0);
-            double startPointY = data.getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Y, 0);
-            double startPointZ = data.getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Z, 0);
-            notHaveEndPoint = data.getBooleanExtra(SearchFragment.EXTRA_END_Point_BOOL, true);
-            startPoint = new Point("startPoint", startPointX, startPointY, startPointZ);
-            endPoint = new Point(name, endPointX, endPointY, endPointZ);
-        }
     }
 }
