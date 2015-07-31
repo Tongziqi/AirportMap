@@ -1,5 +1,6 @@
 package cn.Nino.crim.airportmap.app.Fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import cn.Nino.crim.airportmap.app.Activity.SearchActivity;
 import cn.Nino.crim.airportmap.app.Map.MapInSize;
 import cn.Nino.crim.airportmap.app.Point.Point;
 import cn.Nino.crim.airportmap.app.R;
+import cn.Nino.crim.airportmap.app.ResideMenu.ResideMenu;
 import cn.Nino.crim.airportmap.app.net.NetConnection;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class AirportFragment extends Fragment {
     public static final int SEARCH_CODE = 1;
     private int firstStepDrawLines = 1;
     private Button mButtonB1, mButtonF1, mButtonF2;
-    private ImageButton mImageButtonLocation, mImageButtonSearch;
+    private ImageButton mImageButtonLocation, mImageButtonSearch, mLeftMenuButton;
     private EditText mThePlaceYouWantGo;
     private Handler refurbishHandler = new Handler();
     private Point endPoint = null;
@@ -40,6 +42,7 @@ public class AirportFragment extends Fragment {
     private String startPointAndEndPoint;
     private String startPointAndMidPoint;
     private String midPointAndEndPoint;
+    private ResideMenu resideMenu;
     Boolean notHaveEndPoint = true;
     Boolean hadStepIntoMidPoint = false;
     Boolean youDonnotMove = false;
@@ -49,6 +52,7 @@ public class AirportFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setUpMenu();
 
         super.onCreate(savedInstanceState);
         String endPointName = getActivity().getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE_NAME);
@@ -81,6 +85,7 @@ public class AirportFragment extends Fragment {
         mButtonF2 = (Button) view.findViewById(R.id.button_f2);
         mThePlaceYouWantGo = (EditText) view.findViewById(R.id.search_place);
         mThePlaceYouWantGo.setText(R.string.search_place);
+        mLeftMenuButton = (ImageButton) view.findViewById(R.id.left_menu);
         mImageButtonLocation = (ImageButton) view.findViewById(R.id.location_button);
         mImageButtonSearch = (ImageButton) view.findViewById(R.id.search_place_button);
 
@@ -109,6 +114,13 @@ public class AirportFragment extends Fragment {
                 refurbishHandler.postDelayed(runnable, 50);  // 定时刷新任务
             }
         });*/
+
+        mLeftMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resideMenu.openMenu(ResideMenu.DIRECTION_LEFT);
+            }
+        });
         mImageButtonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,7 +182,7 @@ public class AirportFragment extends Fragment {
             } else {
                 initMap();
                 ArrayList<Point> points = new ArrayList<Point>();
-                if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
+                //if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
                     if (startPointAndEndPoint == null) {  //处理有没有中间点 这里面是有中间点
                         ArrayList<Point> pointsStartAndMid = new NetConnection().getPathPoint(startPointAndMidPoint, false);
                         ArrayList<Point> pointsMidAndEnd = new NetConnection().getPathPoint(midPointAndEndPoint, true);
@@ -185,13 +197,13 @@ public class AirportFragment extends Fragment {
                     msg.what = 100;
                     msg.obj = points;
                     handler.sendMessage(msg);  //把值传出去
-                }
-                if (pointArrayListLine.size() != 0) {
+              //  }
+/*                if (pointArrayListLine.size() != 0) {
                     ArrayList<Point> startPointsList = new ArrayList<Point>();
                     startPointsList = new NetConnection().getPoint();
                     pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
                     points = pointArrayListLine;
-                }
+                }*/
                 return points;
             }
         }
@@ -301,4 +313,30 @@ public class AirportFragment extends Fragment {
         super.onDestroy();
         refurbishHandler.removeCallbacks(runnable);
     }
+
+    private void setUpMenu() {
+        resideMenu = new ResideMenu(getActivity());
+        resideMenu.setBackground(R.drawable.plane);
+        resideMenu.attachToActivity(getActivity());
+        resideMenu.setMenuListener(new ResideMenu.OnMenuListener() {
+            @Override
+            public void openMenu() {
+
+            }
+
+            @Override
+            public void closeMenu() {
+
+            }
+        });
+        resideMenu.setScaleValue(0.6f);
+    }
+
+    private void changeActivity(Activity targetActivity) {  //点击转向不同的activity
+        resideMenu.clearIgnoredViewList();
+        Intent intent = new Intent(getActivity(), targetActivity.getClass());
+        startActivity(intent);
+    }
+
+
 }
