@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import cn.Nino.crim.airportmap.app.Activity.SearchActivity;
 import cn.Nino.crim.airportmap.app.Map.MapInSize;
 import cn.Nino.crim.airportmap.app.Point.Point;
+import cn.Nino.crim.airportmap.app.Point.PointEstimate;
 import cn.Nino.crim.airportmap.app.R;
 import cn.Nino.crim.airportmap.app.ResideMenu.ResideMenu;
 import cn.Nino.crim.airportmap.app.net.NetConnection;
@@ -182,7 +183,7 @@ public class AirportFragment extends Fragment {
             } else {
                 initMap();
                 ArrayList<Point> points = new ArrayList<Point>();
-                //if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
+                if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
                     if (startPointAndEndPoint == null) {  //处理有没有中间点 这里面是有中间点
                         ArrayList<Point> pointsStartAndMid = new NetConnection().getPathPoint(startPointAndMidPoint, false);
                         ArrayList<Point> pointsMidAndEnd = new NetConnection().getPathPoint(midPointAndEndPoint, true);
@@ -197,13 +198,20 @@ public class AirportFragment extends Fragment {
                     msg.what = 100;
                     msg.obj = points;
                     handler.sendMessage(msg);  //把值传出去
-              //  }
-/*                if (pointArrayListLine.size() != 0) {
+                }
+                if (pointArrayListLine.size() != 0) {
                     ArrayList<Point> startPointsList = new ArrayList<Point>();
                     startPointsList = new NetConnection().getPoint();
-                    pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
-                    points = pointArrayListLine;
-                }*/
+
+                    boolean isInLine = PointEstimate.isOnAllPath(startPointsList.get(0), pointArrayListLine, 0.05);
+
+                    if (isInLine) {
+                        pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
+                        points = pointArrayListLine;
+                    } else {
+                        points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
+                    }
+                }
                 return points;
             }
         }
