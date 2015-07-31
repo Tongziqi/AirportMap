@@ -19,7 +19,7 @@ public class NetConnection {
     public static final String SEVER_URL_TEST = "http://172.18.4.184:8080/Access";
     public static final String SEVER_URL_FORMAL = "http://172.18.4.166:8080/Access";
     public static final String SEVER_URL_OPEN = "http://172.21.14.44:8080/user/Access";
-    public static final String SEVER_URL_MOHANWEN = "http://10.18.16.223:8080/Access";
+    public static final String SEVER_URL_MOHANWEN = "http://10.18.18.92:8080/Access";
     public static final String ACTION_LOCATE = "locate";
     public static final String Test = "test";
     public static final String Path = "getPath";
