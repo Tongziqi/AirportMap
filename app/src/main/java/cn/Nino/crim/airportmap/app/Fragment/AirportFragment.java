@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,7 @@ import cn.Nino.crim.airportmap.app.Point.Point;
 import cn.Nino.crim.airportmap.app.Point.PointEstimate;
 import cn.Nino.crim.airportmap.app.R;
 import cn.Nino.crim.airportmap.app.ResideMenu.ResideMenu;
+import cn.Nino.crim.airportmap.app.ResideMenu.ResideMenuItem;
 import cn.Nino.crim.airportmap.app.net.NetConnection;
 
 import java.util.ArrayList;
@@ -47,8 +47,11 @@ public class AirportFragment extends Fragment {
     Boolean notHaveEndPoint = true;
     Boolean hadStepIntoMidPoint = false;
     Boolean youDonnotMove = false;
-    ArrayList<Point> mPoints;
     ArrayList<Point> pointArrayListLine = new ArrayList<Point>(); //存储得到的路径 保证不每次都重绘
+    ArrayList<Point> pathFromOld = new ArrayList<Point>(); //存储原始的路径
+
+    private ResideMenuItem resideMenuItem1, resideMenuItem2, resideMenuItem3, resideMenuItem4, resideMenuItem5,
+            resideMenuItem6, resideMenuItem7, resideMenuItem8, resideMenuItem9, resideMenuItem10, resideMenuItem11; //左侧的图片
 
 
     @Override
@@ -93,28 +96,24 @@ public class AirportFragment extends Fragment {
         final Handler handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                if (msg.what == 100) {
-                    pointArrayListLine = (ArrayList<Point>) msg.obj;
-                    Log.e("获得的路径:", pointArrayListLine.toString());
-                }
+                getPathFromHandle(msg);
             }
         };
 
-        //定位是每秒都需要
+        /*//定位是每秒都需要
         //但是规划路径只需要特定的时候才需要
         new NetTask(handler).execute();
         refurbishHandler.removeCallbacks(runnable);
-        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
+        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来*/
 
-
-/*        mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
+        mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new NetTask(refurbishHandler).execute();
+                new NetTask(handler).execute();
                 refurbishHandler.removeCallbacks(runnable);
-                refurbishHandler.postDelayed(runnable, 50);  // 定时刷新任务
+                refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务
             }
-        });*/
+        });
 
         mLeftMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,6 +168,15 @@ public class AirportFragment extends Fragment {
         return view;
     }
 
+
+    private ArrayList<Point> getPathFromHandle(Message msg) {
+        if (msg.what == 100) {
+            pointArrayListLine = (ArrayList<Point>) msg.obj;
+        }
+        return pointArrayListLine;
+    }
+
+
     private class NetTask extends AsyncTask<Void, Void, ArrayList<Point>> {
         private Handler handler;
 
@@ -197,19 +205,29 @@ public class AirportFragment extends Fragment {
                     Message msg = new Message();
                     msg.what = 100;
                     msg.obj = points;
+                    handler.obtainMessage();
                     handler.sendMessage(msg);  //把值传出去
                 }
                 if (pointArrayListLine.size() != 0) {
-                    ArrayList<Point> startPointsList = new ArrayList<Point>();
+                    ArrayList<Point> startPointsList;
                     startPointsList = new NetConnection().getPoint();
 
-                    boolean isInLine = PointEstimate.isOnAllPath(startPointsList.get(0), pointArrayListLine, 0.05);
+                    boolean isInLine = PointEstimate.isOnAllPath(startPointsList.get(0), pointArrayListLine, 0.1);
 
                     if (isInLine) {
                         pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
                         points = pointArrayListLine;
+                        pathFromOld = (ArrayList<Point>) pointArrayListLine.clone();
                     } else {
+                        // Log.e("不在这个位置上面，目前的点是:", startPointsList.get(0).toString());
+                        startPoint = startPointsList.get(0);
+                        initMap();  //重新获得起点和终点
                         points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
+                        pointArrayListLine = points; // 这时候赋值新的pointArrayListLine
+                        Message msg = new Message();
+                        msg.what = 100;
+                        msg.obj = points;
+                        handler.sendMessage(msg);  //把值传出去
                     }
                 }
                 return points;
@@ -217,14 +235,13 @@ public class AirportFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Point> points) {
-            mPoints = points;
+        protected void onPostExecute(final ArrayList<Point> points) {
             if (notHaveEndPoint) {
                 if (!whetherYouMove(startPoint, points.get(0))) {
                     startPoint = points.get(0);
                     MapInSize.getMapActivity().cleanPoint();
-                    MapInSize.getMapActivity().checkFloorZ(mPoints.get(0).getPointZ());
-                    MapInSize.getMapActivity().redrawPoint(mPoints.get(0).getPointX(), mPoints.get(0).getPointY(), mPoints.get(0).getPointZ());
+                    MapInSize.getMapActivity().checkFloorZ(points.get(0).getPointZ());
+                    MapInSize.getMapActivity().redrawPoint(points.get(0).getPointX(), points.get(0).getPointY(), points.get(0).getPointZ());
                 }
             } else {
                 if (firstStepDrawLines >= 1) {
@@ -240,10 +257,16 @@ public class AirportFragment extends Fragment {
                         new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("懂得", null).show();
                         hadStepIntoMidPoint = false;
                     }
-                    startPoint = points.get(0);
-                    MapInSize.getMapActivity().cleanPoint();
-                    MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
-                    MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+
+                    if (!points.equals(pathFromOld)) {  //就是如果偏离了路径
+                        new AlertDialog.Builder(getActivity()).setTitle("您已经偏离路径,系统已经重新帮您规划").setPositiveButton("好的", null).show();
+                    } else { //还在路径上
+                        startPoint = points.get(0);
+                        MapInSize.getMapActivity().cleanPoint();
+                        MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
+                        MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+                    }
+
                 }
             }
         }
@@ -285,9 +308,7 @@ public class AirportFragment extends Fragment {
         double midPointY = midPoint.getPointY();
         hadStepIntoMidPoint = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05;
         return hadStepIntoMidPoint;
-
     }
-
 
     private ArrayList<Point> divideLayePoint(ArrayList<Point> points) { //得到第一层的点 // 每次都获得第一层的点
         ArrayList<Point> firstListPoints = new ArrayList<Point>();
@@ -324,7 +345,7 @@ public class AirportFragment extends Fragment {
 
     private void setUpMenu() {
         resideMenu = new ResideMenu(getActivity());
-        resideMenu.setBackground(R.drawable.plane);
+        resideMenu.setBackground(R.drawable.bgmap);
         resideMenu.attachToActivity(getActivity());
         resideMenu.setMenuListener(new ResideMenu.OnMenuListener() {
             @Override
@@ -338,6 +359,32 @@ public class AirportFragment extends Fragment {
             }
         });
         resideMenu.setScaleValue(0.6f);
+
+        // create left menu items;
+        resideMenuItem1 = new ResideMenuItem(getActivity(), R.drawable.leftmap1, "出入口");
+        resideMenuItem2 = new ResideMenuItem(getActivity(), R.drawable.leftmap2, "登机口");
+        resideMenuItem3 = new ResideMenuItem(getActivity(), R.drawable.leftmap3, "电梯/扶梯");
+        resideMenuItem4 = new ResideMenuItem(getActivity(), R.drawable.leftmap4, "直机柜台");
+        resideMenuItem5 = new ResideMenuItem(getActivity(), R.drawable.leftmap5, "安检口");
+        resideMenuItem6 = new ResideMenuItem(getActivity(), R.drawable.leftmap6, "饮水处/卫生间");
+        resideMenuItem7 = new ResideMenuItem(getActivity(), R.drawable.leftmap7, "问讯处/票务");
+        resideMenuItem8 = new ResideMenuItem(getActivity(), R.drawable.leftmap8, "商店");
+        resideMenuItem9 = new ResideMenuItem(getActivity(), R.drawable.leftmap9, "行李盘");
+        resideMenuItem10 = new ResideMenuItem(getActivity(), R.drawable.leftmap10, "立柱");
+        resideMenuItem11 = new ResideMenuItem(getActivity(), R.drawable.leftmap11, "墙体");
+        resideMenu.addMenuItem(resideMenuItem1, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem2, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem3, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem4, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem5, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem6, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem7, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem8, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem9, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem10, ResideMenu.DIRECTION_LEFT);
+        resideMenu.addMenuItem(resideMenuItem11, ResideMenu.DIRECTION_LEFT);
+        resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_RIGHT); //设置向右滑动
+        resideMenu.setSwipeDirectionDisable(ResideMenu.DIRECTION_LEFT);  //设置向左滑动
     }
 
     private void changeActivity(Activity targetActivity) {  //点击转向不同的activity
@@ -345,6 +392,5 @@ public class AirportFragment extends Fragment {
         Intent intent = new Intent(getActivity(), targetActivity.getClass());
         startActivity(intent);
     }
-
 
 }

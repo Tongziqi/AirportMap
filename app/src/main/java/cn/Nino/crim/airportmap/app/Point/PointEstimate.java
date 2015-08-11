@@ -86,7 +86,7 @@ public class PointEstimate {
 
     public static boolean isOnAllPath(Point p, List<Point> list,double scope){
 
-        for(int count = 1; count < list.size()-1; count ++){
+        for(int count = 2; count < list.size(); count ++){
             if(isOnPath(p, list, count, scope)){
                 return true;
             }
@@ -94,18 +94,4 @@ public class PointEstimate {
         return false;
     }
 
-/*    public static void main(String[] args) {
-        List<Point> list = new ArrayList<Point>();
-        list.add(0, new Point("a", 0.5, 0.3, 1));
-        list.add(1, new Point("a", 0.5, 0.3, 1));
-        list.add(2, new Point("a", 0.6, 0.3, 1));
-        list.add(3, new Point("a", 0.6, 0.1, 1));
-        list.add(4, new Point("a", 0.7, 0.1, 1));
-        PointEstimate pe = new PointEstimate();
-        Point cur = new Point("sb", 0.51, 0.3, 1);
-        if(pe.isOnAllPath(cur, list, 0.1))
-            System.out.println("good");
-        else
-            System.out.println("bad");
-    }*/
 }

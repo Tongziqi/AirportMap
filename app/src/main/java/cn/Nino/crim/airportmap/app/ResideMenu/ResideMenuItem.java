@@ -14,11 +14,15 @@ import cn.Nino.crim.airportmap.app.R;
  * Time: 下午11:05
  * Mail: specialcyci@gmail.com
  */
-public class ResideMenuItem extends LinearLayout{
+public class ResideMenuItem extends LinearLayout {
 
-    /** menu item  icon  */
+    /**
+     * menu item  icon
+     */
     private ImageView iv_icon;
-    /** menu item  title */
+    /**
+     * menu item  title
+     */
     private TextView tv_title;
 
     public ResideMenuItem(Context context) {
@@ -37,11 +41,12 @@ public class ResideMenuItem extends LinearLayout{
         super(context);
         initViews(context);
         iv_icon.setImageResource(icon);
+        //tv_title.setTextColor(Color.WHITE); //变成了黑色
         tv_title.setText(title);
     }
 
-    private void initViews(Context context){
-        LayoutInflater inflater=(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    private void initViews(Context context) {
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.residemenu_item, this);
         iv_icon = (ImageView) findViewById(R.id.iv_icon);
         tv_title = (TextView) findViewById(R.id.tv_title);
@@ -52,16 +57,17 @@ public class ResideMenuItem extends LinearLayout{
      *
      * @param icon
      */
-    public void setIcon(int icon){
+    public void setIcon(int icon) {
         iv_icon.setImageResource(icon);
     }
 
     /**
      * set the title with resource
      * ;
+     *
      * @param title
      */
-    public void setTitle(int title){
+    public void setTitle(int title) {
         tv_title.setText(title);
     }
 
@@ -70,7 +76,7 @@ public class ResideMenuItem extends LinearLayout{
      *
      * @param title
      */
-    public void setTitle(String title){
+    public void setTitle(String title) {
         tv_title.setText(title);
     }
 }
