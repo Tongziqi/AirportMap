@@ -40,13 +40,13 @@ public class MapInSize extends SurfaceView {
 
     public void setBackground(double layer) {
         if (layer == 0.0) {
-            setBackgroundResource(R.drawable.b1);
+            setBackgroundResource(R.drawable.b1_map);
         }
         if (layer == 1.0) {
-            setBackgroundResource(R.drawable.f1);
+            setBackgroundResource(R.drawable.f1_map);
         }
         if (layer == 2.0) {
-            setBackgroundResource(R.drawable.f2);
+            setBackgroundResource(R.drawable.f2_map);
         }
 
     }

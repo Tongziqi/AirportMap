@@ -72,7 +72,7 @@ public class NetConnection {
     }
 
     public ArrayList<Point> getPoint() {
-        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
+        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
         return downloadPoint(url);
@@ -80,10 +80,10 @@ public class NetConnection {
 
     public ArrayList<Point> getPathPoint(String nativePoints, boolean hasMidPoint) {
         String allPathString; //产生的路径
-        String urlPoint = Uri.parse(SEVER_URL_TEST).buildUpon()
+        String urlPoint = Uri.parse(SEVER_URL_OPEN).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
-        String url = Uri.parse(SEVER_URL_TEST).buildUpon()
+        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
                 .appendQueryParameter("action", Path)
                 .appendQueryParameter("Points", nativePoints)
                 .build().toString();

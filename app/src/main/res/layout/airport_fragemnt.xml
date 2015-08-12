@@ -19,7 +19,6 @@
                      android:contentDescription="@string/search_button"/>
 
     </LinearLayout>
-
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -30,45 +29,66 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/surfaceView"/>
     </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
                   android:orientation="horizontal"
-                  android:layout_margin="10dp">
-
+                  android:layout_margin="10dp"
+                  android:baselineAligned="false">
         <LinearLayout android:layout_width="0dp"
                       android:layout_height="wrap_content"
                       android:layout_weight="1">
-            <ImageButton android:layout_width="50dp"
-                         android:layout_height="50dp"
-                         android:background="@drawable/abc_btn_radio_material"
+            <ImageButton android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:background="@drawable/leftmenu_button"
+                         android:padding="5dp"
+                         android:scaleType="fitXY"
                          android:id="@+id/left_menu"/>
-            <ImageButton android:layout_width="50dp"
-                         android:layout_height="50dp"
-                         android:background="@drawable/location"
+        </LinearLayout>
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:layout_weight="7"
+                      android:layout_marginLeft="2dp">
+            <ImageView android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@drawable/left_arow"/>
+            <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/b1_button"
+                    android:id="@+id/button_b1"/>
+            <ImageView android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@drawable/three_point"/>
+            <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/f1_button"
+                    android:id="@+id/button_f1"/>
+            <ImageView android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@drawable/three_point"/>
+            <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/f2_button"
+                    android:id="@+id/button_f2"/>
+            <ImageView android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@drawable/right_arow"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:layout_marginLeft="4dp">
+            <ImageButton android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_marginLeft="4dp"
+                         android:background="@drawable/location_button"
                          android:id="@+id/location_button"/>
         </LinearLayout>
-        <LinearLayout android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal">
-            <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/B1"
-                    android:id="@+id/button_b1"/>
-            <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/F1"
-                    android:id="@+id/button_f1"/>
-            <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/F2"
-                    android:id="@+id/button_f2"/>
-        </LinearLayout>
-
-
     </LinearLayout>
 </LinearLayout>

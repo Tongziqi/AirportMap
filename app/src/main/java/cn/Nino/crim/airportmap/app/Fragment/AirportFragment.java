@@ -100,11 +100,11 @@ public class AirportFragment extends Fragment {
             }
         };
 
-        /*//定位是每秒都需要
+        //定位是每秒都需要
         //但是规划路径只需要特定的时候才需要
         new NetTask(handler).execute();
         refurbishHandler.removeCallbacks(runnable);
-        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来*/
+        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
 
         mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,16 +192,7 @@ public class AirportFragment extends Fragment {
                 initMap();
                 ArrayList<Point> points = new ArrayList<Point>();
                 if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
-                    if (startPointAndEndPoint == null) {  //处理有没有中间点 这里面是有中间点
-                        ArrayList<Point> pointsStartAndMid = new NetConnection().getPathPoint(startPointAndMidPoint, false);
-                        ArrayList<Point> pointsMidAndEnd = new NetConnection().getPathPoint(midPointAndEndPoint, true);
-
-                        points.addAll(pointsStartAndMid);
-                        points.addAll(pointsMidAndEnd);
-
-                    } else { //没有中间点
-                        points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
-                    }
+                    points = getPath();
                     Message msg = new Message();
                     msg.what = 100;
                     msg.obj = points;
@@ -220,9 +211,10 @@ public class AirportFragment extends Fragment {
                         pathFromOld = (ArrayList<Point>) pointArrayListLine.clone();
                     } else {
                         // Log.e("不在这个位置上面，目前的点是:", startPointsList.get(0).toString());
+                        points.clear(); //删除points
                         startPoint = startPointsList.get(0);
                         initMap();  //重新获得起点和终点
-                        points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
+                        points = getPath();
                         pointArrayListLine = points; // 这时候赋值新的pointArrayListLine
                         Message msg = new Message();
                         msg.what = 100;
@@ -280,10 +272,26 @@ public class AirportFragment extends Fragment {
         }
     };
 
+    private ArrayList<Point> getPath() {
+        ArrayList<Point> points = new ArrayList<Point>();
+        if (startPointAndEndPoint == null) {  //如果有中间点
+            ArrayList<Point> pointsStartAndMid = new NetConnection().getPathPoint(startPointAndMidPoint, false);
+            ArrayList<Point> pointsMidAndEnd = new NetConnection().getPathPoint(midPointAndEndPoint, true);//后面参数为true 就是不加开始节点
+
+            points.addAll(pointsStartAndMid);
+            points.addAll(pointsMidAndEnd);
+
+        } else { //没有中间点
+            points = new NetConnection().getPathPoint(startPointAndEndPoint, false);
+        }
+        return points;
+
+    }
+
     private void initMap() {
         if (midPoint.getPointX() == 0.0 && midPoint.getPointY() == 0.0
                 && midPoint.getPointZ() == 0.0 || judgeMidPoint(startPoint, midPoint)) {
-            if (startPoint != null && endPoint != null) {
+            if (startPoint != null && endPoint != null) {   //这里面是没有中间点
                 midPoint.setPointX(0.0);
                 midPoint.setPointY(0.0);
                 midPoint.setPointZ(0.0);  //这样写是因为走过中间点后，就把中间点变成0
@@ -291,7 +299,7 @@ public class AirportFragment extends Fragment {
                 String endPointString = endPoint.getPointString(endPoint);
                 startPointAndEndPoint = startPointString + "/" + endPointString;
             }
-        } else {
+        } else { //如果有中间点
             String startPointString = startPoint.getPointString(startPoint);
             String midPointString = midPoint.getPointString(midPoint);
             String endPointString = endPoint.getPointString(endPoint);
@@ -361,15 +369,15 @@ public class AirportFragment extends Fragment {
         resideMenu.setScaleValue(0.6f);
 
         // create left menu items;
-        resideMenuItem1 = new ResideMenuItem(getActivity(), R.drawable.leftmap1, "出入口");
-        resideMenuItem2 = new ResideMenuItem(getActivity(), R.drawable.leftmap2, "登机口");
-        resideMenuItem3 = new ResideMenuItem(getActivity(), R.drawable.leftmap3, "电梯/扶梯");
-        resideMenuItem4 = new ResideMenuItem(getActivity(), R.drawable.leftmap4, "直机柜台");
-        resideMenuItem5 = new ResideMenuItem(getActivity(), R.drawable.leftmap5, "安检口");
-        resideMenuItem6 = new ResideMenuItem(getActivity(), R.drawable.leftmap6, "饮水处/卫生间");
-        resideMenuItem7 = new ResideMenuItem(getActivity(), R.drawable.leftmap7, "问讯处/票务");
-        resideMenuItem8 = new ResideMenuItem(getActivity(), R.drawable.leftmap8, "商店");
-        resideMenuItem9 = new ResideMenuItem(getActivity(), R.drawable.leftmap9, "行李盘");
+        resideMenuItem1 = new ResideMenuItem(getActivity(), R.drawable.leftmap1, "出入口(D)");
+        resideMenuItem2 = new ResideMenuItem(getActivity(), R.drawable.leftmap2, "登机口(E)");
+        resideMenuItem3 = new ResideMenuItem(getActivity(), R.drawable.leftmap3, "电梯/扶梯(EL/ES)");
+        resideMenuItem4 = new ResideMenuItem(getActivity(), R.drawable.leftmap4, "直机柜台(C)");
+        resideMenuItem5 = new ResideMenuItem(getActivity(), R.drawable.leftmap5, "安检口(SC)");
+        resideMenuItem6 = new ResideMenuItem(getActivity(), R.drawable.leftmap6, "饮水处/卫生间(WT/W)");
+        resideMenuItem7 = new ResideMenuItem(getActivity(), R.drawable.leftmap7, "问讯处/票务(Q)");
+        resideMenuItem8 = new ResideMenuItem(getActivity(), R.drawable.leftmap8, "商店(S)");
+        resideMenuItem9 = new ResideMenuItem(getActivity(), R.drawable.leftmap9, "行李盘(B)");
         resideMenuItem10 = new ResideMenuItem(getActivity(), R.drawable.leftmap10, "立柱");
         resideMenuItem11 = new ResideMenuItem(getActivity(), R.drawable.leftmap11, "墙体");
         resideMenu.addMenuItem(resideMenuItem1, ResideMenu.DIRECTION_LEFT);

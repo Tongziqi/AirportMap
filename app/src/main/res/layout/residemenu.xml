@@ -17,10 +17,10 @@
 
     <ScrollView
         android:id="@+id/sv_left_menu"
-        android:layout_width="220dp"
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
         android:layout_gravity="left|center_vertical"
-        android:paddingLeft="20dp"
+        android:paddingLeft="10dp"
         android:scrollbars="none" >
 
         <LinearLayout

@@ -45,7 +45,7 @@ public class MapChangeSize extends SurfaceView implements
         mSurHolder = getHolder();
         mSurHolder.addCallback(this);
         this.setOnTouchListener(this);
-        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.f1);
+        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.f2_map);
         setBitmap(mBitmap);
     }
 
