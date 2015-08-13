@@ -13,8 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import cn.Nino.crim.airportmap.app.Activity.SearchActivity;
 import cn.Nino.crim.airportmap.app.Map.MapInSize;
 import cn.Nino.crim.airportmap.app.Point.Point;
@@ -34,8 +35,9 @@ public class AirportFragment extends Fragment {
     public static final int SEARCH_CODE = 1;
     private int firstStepDrawLines = 1;
     private Button mButtonB1, mButtonF1, mButtonF2;
-    private ImageButton mImageButtonLocation, mImageButtonSearch, mLeftMenuButton;
-    private EditText mThePlaceYouWantGo;
+    private ImageButton mImageButtonLocation,  mLeftMenuButton;
+    private ImageView mImageButtonSearch;
+    private TextView mThePlaceYouWantGo;
     private Handler refurbishHandler = new Handler();
     private Point endPoint = null;
     private Point startPoint = null;
@@ -87,11 +89,11 @@ public class AirportFragment extends Fragment {
         mButtonB1 = (Button) view.findViewById(R.id.button_b1);
         mButtonF1 = (Button) view.findViewById(R.id.button_f1);
         mButtonF2 = (Button) view.findViewById(R.id.button_f2);
-        mThePlaceYouWantGo = (EditText) view.findViewById(R.id.search_place);
-        mThePlaceYouWantGo.setText(R.string.search_place);
+        mThePlaceYouWantGo = (TextView) view.findViewById(R.id.search_place);
+        mThePlaceYouWantGo.setTextColor(0xffffffff);
         mLeftMenuButton = (ImageButton) view.findViewById(R.id.left_menu);
         mImageButtonLocation = (ImageButton) view.findViewById(R.id.location_button);
-        mImageButtonSearch = (ImageButton) view.findViewById(R.id.search_place_button);
+        mImageButtonSearch = (ImageView) view.findViewById(R.id.search_place_button);
 
         final Handler handler = new Handler() {
             @Override
@@ -126,7 +128,7 @@ public class AirportFragment extends Fragment {
             public void onClick(View v) {
                 refurbishHandler.removeCallbacks(runnable);
                 Intent intent = new Intent(getActivity(), SearchActivity.class);
-                intent.putExtra(SearchFragment.EXTRA_END_PLACE, String.valueOf(mThePlaceYouWantGo.getText()));
+                //intent.putExtra(SearchFragment.EXTRA_END_PLACE, String.valueOf(mThePlaceYouWantGo.getText()));
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_X, String.valueOf(startPoint.getPointX()));
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_Y, String.valueOf(startPoint.getPointY()));
                 intent.putExtra(SearchFragment.EXTRA_START_PLACE_Z, String.valueOf(startPoint.getPointZ()));
@@ -155,7 +157,7 @@ public class AirportFragment extends Fragment {
                 MapInSize.getMapActivity().setBackground(2);
             }
         });
-        mThePlaceYouWantGo.setOnClickListener(new View.OnClickListener() {
+/*        mThePlaceYouWantGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mThePlaceYouWantGo.getText().toString().length() != 0) {
@@ -164,7 +166,7 @@ public class AirportFragment extends Fragment {
                     mThePlaceYouWantGo.setText(R.string.search_place);
                 }
             }
-        });
+        });*/
         return view;
     }
 

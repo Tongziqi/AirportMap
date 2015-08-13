@@ -56,13 +56,18 @@ public class Point {
         this.mTittle = mTittle;
     }
 
-    @Override
+/*    @Override
     public String toString() {
         return "Point{" +
                 "pointX=" + pointX +
                 ", pointY=" + pointY +
                 ", pointZ=" + pointZ +
                 '}';
+    }*/
+
+    @Override
+    public String toString() {
+        return mTittle;
     }
 
     public String getPointString(Point point) {

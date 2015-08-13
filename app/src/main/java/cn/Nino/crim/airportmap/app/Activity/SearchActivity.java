@@ -9,12 +9,12 @@ import cn.Nino.crim.airportmap.app.Fragment.SearchFragment;
 public class SearchActivity extends SingleFragmentActivity {
     @Override
     protected Fragment creatFragment() {
-        String endPlace = getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE);
+        //String endPlace = getIntent().getStringExtra(SearchFragment.EXTRA_END_PLACE);
         String startPointX = getIntent().getStringExtra(SearchFragment.EXTRA_START_PLACE_X);
         String startPointY = getIntent().getStringExtra(SearchFragment.EXTRA_START_PLACE_Y);
         String startPointZ = getIntent().getStringExtra(SearchFragment.EXTRA_START_PLACE_Z);
 
-        return SearchFragment.newInstance(endPlace, startPointX, startPointY, startPointZ);
+        return SearchFragment.newInstance(startPointX, startPointY, startPointZ);
     }
 
 }

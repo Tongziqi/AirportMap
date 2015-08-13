@@ -3,7 +3,7 @@
 
     <string name="app_name">AirportMap</string>
     <string name="hello_world">Hello world!</string>
-    <string name="search_place"> 搜索您想去的地方</string>
+    <string name="search_place">Search here …</string>
     <string name="search_button">搜索地方的按钮</string>
     <string name="B1">B1</string>
     <string name="F1">F1</string>
@@ -17,5 +17,6 @@
     <string name="myPlace">我的位置</string>
     <string name="confirm_mid_place">确定中点</string>
     <string name="middle_place_you_want_to_go">请输入想去的中点</string>
+    <string name="end_place_you_want_to_go">请点击后输入位置</string>
 
 </resources>

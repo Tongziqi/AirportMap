@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="allPoints">
+        <item>电梯(ES1)地下1层</item>
+        <item>扶梯(EL1)地下1层</item>
+        <item>电梯3(ES1)</item>
+        <item>电梯4(ES1)</item>
+        <item>电梯5(ES1)</item>
+        <item>电梯6(ES1)</item>
+        <item>电梯7(ES1)</item>
+        <item>电梯8(ES1)</item>
+        <item>电梯9(ES1)</item>
+        <item>电梯10(ES1)</item>
+    </string-array>
+</resources>

@@ -12,14 +12,15 @@ import cn.Nino.crim.airportmap.app.Activity.AirportActivity;
 import cn.Nino.crim.airportmap.app.Point.Point;
 import cn.Nino.crim.airportmap.app.Point.PointLab;
 import cn.Nino.crim.airportmap.app.R;
+import cn.Nino.crim.airportmap.app.Tools.AutoCompleteAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Administrator on 2015/3/31 0031.
  */
 public class SearchFragment extends Fragment {
-    public static final String EXTRA_END_PLACE = "endPlace";
     public static final String EXTRA_START_PLACE_X = "startx";
     public static final String EXTRA_START_PLACE_Y = "starty";
     public static final String EXTRA_START_PLACE_Z = "startz";
@@ -33,8 +34,9 @@ public class SearchFragment extends Fragment {
     public static final String EXTRA_MID_PLACE_NAME = "midPlaceName";
     public static final String EXTRA_END_Point_BOOL = "endPoint";
     private ArrayList<Point> mPointList;
-    private EditText mStartPlace, mEndPlace, mMidPlace;
-    private String mEndPlaceString;
+    private EditText mStartPlace, mMidPlace;
+    private AutoCompleteTextView mEndPlace;
+    private String mEndPlaceString = "EL";
     private Button navigationButton;
     private Button middlePlaceButton;
     private Button confirmmiddlePlaceButton;
@@ -47,10 +49,10 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         //不用这种方法，因为这种方法每个fragment绑定了一个activity
         // mEndPlaceString = getActivity().getIntent().getStringExtra(AirportFragment.SEARCH_BUTTON);
         //这里我们将传过来的信息保存在argument bundle里面
-        mEndPlaceString = getArguments().getString(EXTRA_END_PLACE);
         startPointX = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_X));
         startPointY = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_Y));
         startPointZ = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_Z));
@@ -58,7 +60,6 @@ public class SearchFragment extends Fragment {
         midPoint = new Point("test", 0.0, 0.0, 0.0);
         mPointList = PointLab.getmPointLab(getActivity(), mEndPlaceString).getmPointList();
         arrayAdapter = new ArrayAdapter<Point>(getActivity(), android.R.layout.simple_list_item_1, mPointList);
-
     }
 
     @Override
@@ -71,17 +72,31 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.search_fragment, container, false);
+        String[] points = getResources().getStringArray(R.array.allPoints);
+        ArrayList<String> arrayListPoint = new ArrayList<String>();
+        arrayListPoint.addAll(Arrays.asList(points).subList(0, points.length - 1));
+
         mStartPlace = (EditText) view.findViewById(R.id.start_place);
         mStartPlace.setText(R.string.myPlace);
         mStartPlace.setFocusable(false);
         mStartPlace.setEnabled(false);
-        mEndPlace = (EditText) view.findViewById(R.id.end_place);
-        mEndPlace.setText(mEndPlaceString);
-        mEndPlace.setFocusable(false);
-        mEndPlace.setEnabled(false);
+        mEndPlace = (AutoCompleteTextView) view.findViewById(R.id.end_place);
+        mEndPlace.setText(R.string.end_place_you_want_to_go);
+        mEndPlace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mEndPlace.getText().toString().length() != 0) {
+                    mEndPlace.setText(null);
+                } else {
+                    mEndPlace.setText(R.string.end_place_you_want_to_go);
+                }
+            }
+        });
+        AutoCompleteAdapter autoCompleteAdapter = new AutoCompleteAdapter(getActivity(), arrayListPoint, 10);//配置Adaptor
+        mEndPlace.setAdapter(autoCompleteAdapter);
+
         mMidPlace = (EditText) view.findViewById(R.id.mid_place);
         mMidPlace.setText(R.string.middle_place_you_want_to_go);
-        mEndPlace.setFocusable(false);
         mMidPlace.setEnabled(false);
         navigationButton = (Button) view.findViewById(R.id.navigation_button);
         navigationButton.setEnabled(false);
@@ -170,9 +185,8 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
-    public static SearchFragment newInstance(String endPlace, String pointX, String pointY, String pointZ) {
+    public static SearchFragment newInstance(String pointX, String pointY, String pointZ) {
         Bundle args = new Bundle();
-        args.putSerializable(EXTRA_END_PLACE, endPlace);
         args.putSerializable(EXTRA_START_PLACE_X, pointX);
         args.putSerializable(EXTRA_START_PLACE_Y, pointY);
         args.putSerializable(EXTRA_START_PLACE_Z, pointZ);
