@@ -1,99 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent" android:orientation="vertical">
+              android:layout_height="match_parent" android:orientation="vertical"
+              android:background="@drawable/bgmap">
 
     <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:baselineAligned="false">
         <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
-                android:layout_weight="1">
+                android:padding="10dp">
             <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="@string/start_place"/>
-                <EditText
-                        android:layout_width="wrap_content"
+                <ImageView android:layout_width="25dp"
+                           android:layout_height="30dp"
+                           android:background="@drawable/start_point_bg"/>
+                <AutoCompleteTextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPostalAddress"
+                        android:layout_marginLeft="5dp"
                         android:ems="7"
+                        android:textColor="#FFFFFF"
                         android:id="@+id/start_place"/>
             </LinearLayout>
             <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="@string/end_place"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp">
+                <ImageView android:layout_width="25dp"
+                           android:layout_height="30dp"
+                           android:background="@drawable/mid_point_bg"/>
                 <AutoCompleteTextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:completionThreshold="1"
                         android:inputType="textPostalAddress"
+                        android:layout_marginLeft="5dp"
                         android:ems="7"
+                        android:textColor="#FFFFFF"
                         android:id="@+id/end_place"/>
             </LinearLayout>
             <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
-                <TextView android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:textAppearance="?android:attr/textAppearanceSmall"
-                          android:text="@string/middle_place"
-                          android:id="@+id/textView"/>
-                <EditText android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:inputType="textPostalAddress"
-                          android:ems="7"
-                          android:id="@+id/mid_place"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/mid_place_first"
+                    android:visibility="gone">
+                <ImageView android:layout_width="25dp"
+                           android:layout_height="30dp"
+                           android:background="@drawable/end_point_bg"/>
+                <AutoCompleteTextView android:layout_width="match_parent"
+                                      android:layout_height="wrap_content"
+                                      android:inputType="textPostalAddress"
+                                      android:layout_marginLeft="5dp"
+                                      android:ems="7"
+                                      android:textColor="#FFFFFF"
+                                      android:id="@+id/mid_place_1"/>
             </LinearLayout>
         </LinearLayout>
-        <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="right">
-            <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/navigation"
-                    android:id="@+id/navigation_button"
-                    android:layout_gravity="center_vertical"/>
-            <Button android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/find_mid_place"
-                    android:id="@+id/find_mid_place"
-                    android:layout_gravity="center_vertical"/>
-            <Button android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/confirm_mid_place"
-                    android:id="@+id/confirm_mid_place"
-                    />
-        </LinearLayout>
+
     </LinearLayout>
     <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" android:layout_margin="10dp">
-        <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/listView"/>
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <ImageButton
+                android:layout_marginLeft="10dp"
+                android:layout_width="113dp"
+                android:layout_height="40dp"
+                android:id="@+id/navigation_button"
+                android:background="@drawable/navegation_button"
+                android:layout_gravity="center_vertical"/>
+        <ImageButton
+                android:layout_marginLeft="10dp"
+                android:layout_width="113dp"
+                android:layout_height="40dp"
+                android:id="@+id/find_mid_place"
+                android:background="@drawable/find_mid_button"
+                android:layout_gravity="center_vertical"/>
     </LinearLayout>
+
 </LinearLayout>

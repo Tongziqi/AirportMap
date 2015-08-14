@@ -64,7 +64,7 @@ public class MapInSize extends SurfaceView {
         if (pointZ != 0.0) {
             mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaint);
         } else if (pointY > 0.38) {
-            Toast.makeText(getContext().getApplicationContext(), "对不起已经超出范围", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext().getApplicationContext(), "对不起已经超出范围", Toast.LENGTH_SHORT).show();
         } else {
             mCanvas.drawCircle((float) (getMap_x() * pointX), (float) ((getMap_y() * (1 - pointY / 0.38))), 10, mPaint);
         }

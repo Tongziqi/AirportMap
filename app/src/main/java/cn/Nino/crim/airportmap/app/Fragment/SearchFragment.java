@@ -33,18 +33,15 @@ public class SearchFragment extends Fragment {
     public static final String EXTRA_END_PLACE_NAME = "endPlaceName";
     public static final String EXTRA_MID_PLACE_NAME = "midPlaceName";
     public static final String EXTRA_END_Point_BOOL = "endPoint";
-    private ArrayList<Point> mPointList;
-    private EditText mStartPlace, mMidPlace;
+    private EditText mStartPlace;
     private AutoCompleteTextView mEndPlace;
-    private String mEndPlaceString = "EL";
-    private Button navigationButton;
-    private Button middlePlaceButton;
-    private Button confirmmiddlePlaceButton;
+    private AutoCompleteTextView mMidPlace1;
+    private ImageButton navigationButton;
+    private ImageButton middlePlaceButton;
     private Point endPoint;
     private Point midPoint;
+    private LinearLayout findmid_linearLayout1;
     double startPointX, startPointY, startPointZ;
-    ArrayAdapter<Point> arrayAdapter;
-    boolean hasmid = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,13 +55,13 @@ public class SearchFragment extends Fragment {
         startPointZ = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_Z));
 
         midPoint = new Point("test", 0.0, 0.0, 0.0);
-        mPointList = PointLab.getmPointLab(getActivity(), mEndPlaceString).getmPointList();
-        arrayAdapter = new ArrayAdapter<Point>(getActivity(), android.R.layout.simple_list_item_1, mPointList);
+        //mPointList = PointLab.getmPointLab(getActivity(), mEndPlaceString).getmPointList();
+        //arrayAdapter = new ArrayAdapter<Point>(getActivity(), android.R.layout.simple_list_item_1, mPointList);
     }
 
     @Override
     public void onResume() {
-        arrayAdapter.notifyDataSetChanged();
+        //arrayAdapter.notifyDataSetChanged();
         super.onResume();
     }
 
@@ -72,8 +69,8 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.search_fragment, container, false);
-        String[] points = getResources().getStringArray(R.array.allPoints);
-        ArrayList<String> arrayListPoint = new ArrayList<String>();
+        final String[] points = getResources().getStringArray(R.array.allPoints);
+        final ArrayList<String> arrayListPoint = new ArrayList<String>();
         arrayListPoint.addAll(Arrays.asList(points).subList(0, points.length - 1));
 
         mStartPlace = (EditText) view.findViewById(R.id.start_place);
@@ -92,72 +89,59 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
-        AutoCompleteAdapter autoCompleteAdapter = new AutoCompleteAdapter(getActivity(), arrayListPoint, 10);//配置Adaptor
+        AutoCompleteAdapter autoCompleteAdapter = new AutoCompleteAdapter(getActivity(), arrayListPoint, 100);//配置Adaptor
         mEndPlace.setAdapter(autoCompleteAdapter);
+        mEndPlace.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        mMidPlace = (EditText) view.findViewById(R.id.mid_place);
-        mMidPlace.setText(R.string.middle_place_you_want_to_go);
-        mMidPlace.setEnabled(false);
-        navigationButton = (Button) view.findViewById(R.id.navigation_button);
-        navigationButton.setEnabled(false);
-        middlePlaceButton = (Button) view.findViewById(R.id.find_mid_place);
-        middlePlaceButton.setEnabled(false);
-        confirmmiddlePlaceButton = (Button) view.findViewById(R.id.confirm_mid_place);
-        confirmmiddlePlaceButton.setEnabled(false);
+                String text = mEndPlace.getText().toString();
+                endPoint = PointLab.getmPointLab(getActivity(), text).getmPointList().get(0);
+                Toast.makeText(getActivity(), "您要去的终点为:" + endPoint.getmTittle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        navigationButton = (ImageButton) view.findViewById(R.id.navigation_button);
+        navigationButton.setEnabled(true);
 
-        mMidPlace.setOnClickListener(new View.OnClickListener() {
+        middlePlaceButton = (ImageButton) view.findViewById(R.id.find_mid_place);
+        middlePlaceButton.setEnabled(true);
+
+        findmid_linearLayout1 = (LinearLayout) view.findViewById(R.id.mid_place_first);
+
+
+        mMidPlace1 = (AutoCompleteTextView) view.findViewById(R.id.mid_place_1);
+        mMidPlace1.setText(R.string.middle_place_you_want_to_go);
+        mMidPlace1.setEnabled(false);
+        mMidPlace1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mMidPlace.getText().toString().length() != 0) {
-                    mMidPlace.setText(null);
+                if (mMidPlace1.getText().toString().length() != 0) {
+                    mMidPlace1.setText(null);
                 } else {
-                    mMidPlace.setText(R.string.middle_place_you_want_to_go);
+                    mMidPlace1.setText(R.string.middle_place_you_want_to_go);
                 }
             }
         });
+        mMidPlace1.setAdapter(autoCompleteAdapter);
+        mMidPlace1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                String text = mMidPlace1.getText().toString();
+                midPoint = PointLab.getmPointLab(getActivity(), text).getmPointList().get(0);
+                Toast.makeText(getActivity(), "您要去的中点为:" + midPoint.getmTittle(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         middlePlaceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mMidPlace.setFocusable(true);
-                mMidPlace.setEnabled(true);
-                navigationButton.setEnabled(false);
-                confirmmiddlePlaceButton.setEnabled(true);
+                findmid_linearLayout1.setVisibility(View.VISIBLE);
+                mMidPlace1.setEnabled(true);
             }
         });
 
-
-        final ListView listView = (ListView) view.findViewById(R.id.listView);
-        listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!hasmid) {
-                    endPoint = mPointList.get(position);
-                    mEndPlace.setText(mPointList.get(position).getmTittle());
-                } else {
-                    midPoint = mPointList.get(position);
-                    mMidPlace.setText(mPointList.get(position).getmTittle());
-                    navigationButton.setEnabled(true);
-                    confirmmiddlePlaceButton.setEnabled(false);
-                }
-                navigationButton.setEnabled(true);
-                middlePlaceButton.setEnabled(true);
-            }
-        });
-
-        confirmmiddlePlaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPointList = PointLab.getmPointLab(getActivity(), String.valueOf(mMidPlace.getText())).getmPointList();
-                arrayAdapter = new ArrayAdapter<Point>(getActivity(), android.R.layout.simple_list_item_1, mPointList);
-                hasmid = true;
-                arrayAdapter.notifyDataSetChanged();
-                listView.setAdapter(arrayAdapter);
-                //Log.e("新的List", String.valueOf(mPointList));
-            }
-        });
-        arrayAdapter.notifyDataSetChanged();
 
         navigationButton.setOnClickListener(new View.OnClickListener() {
             @Override
