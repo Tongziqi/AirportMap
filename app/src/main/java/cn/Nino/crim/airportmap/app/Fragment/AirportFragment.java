@@ -3,6 +3,7 @@ package cn.Nino.crim.airportmap.app.Fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,10 +13,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.*;
 import cn.Nino.crim.airportmap.app.Activity.SearchActivity;
 import cn.Nino.crim.airportmap.app.Map.MapInSize;
 import cn.Nino.crim.airportmap.app.Point.Point;
@@ -196,14 +194,15 @@ public class AirportFragment extends Fragment {
                     startPointsList = new NetConnection().getPoint();
 
                     boolean isInLine = PointEstimate.isOnAllPath(startPointsList.get(0), pointArrayListLine, 0.1);
-
-                    if (isInLine) {
+                    boolean isInSameLayer = startPointsList.get(0).getPointZ() == pointArrayListLine.get(1).getPointZ(); // 是否在同一层
+                    if (isInLine && isInSameLayer) {
                         pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
                         points = pointArrayListLine;
                         pathFromOld = (ArrayList<Point>) pointArrayListLine.clone();
                     } else {
                         // Log.e("不在这个位置上面，目前的点是:", startPointsList.get(0).toString());
                         points.clear(); //删除points
+                        pointArrayListLine.clear();
                         startPoint = startPointsList.get(0);
                         initMap();  //重新获得起点和终点
                         points = getPath();
@@ -220,55 +219,89 @@ public class AirportFragment extends Fragment {
 
         @Override
         protected void onPostExecute(final ArrayList<Point> points) {
-            if (notHaveEndPoint) {
-                if (!whetherYouMove(startPoint, points.get(0))) {
-                    startPoint = points.get(0);
-                    MapInSize.getMapActivity().cleanPoint();
-                    MapInSize.getMapActivity().checkFloorZ(points.get(0).getPointZ());
-                    MapInSize.getMapActivity().redrawPoint(points.get(0).getPointX(), points.get(0).getPointY(), points.get(0).getPointZ());
-                }
-            } else {
-                if (firstStepDrawLines >= 1) {
-                    startPoint = points.get(0);
-                    mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle()); //就是从搜索界面返回的情形
-                    MapInSize.getMapActivity().cleanPoint();
-                    MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
-                    MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
-                    firstStepDrawLines--;
-                }
-                if (!whetherYouMove(startPoint, points.get(0))) { //如果移动
-                    if (hadStepIntoMidPoint) {
-                        new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("确定", null).show();
-                        hadStepIntoMidPoint = false;
+            if (points.size() > 0) {
+                if (notHaveEndPoint) {
+                    if (!whetherYouMove(startPoint, points.get(0))) {
+                        startPoint = points.get(0);
+                        if (points.size() != 0)
+                            MapInSize.getMapActivity().cleanPoint();
+                        MapInSize.getMapActivity().checkFloorZ(points.get(0).getPointZ());
+                        MapInSize.getMapActivity().redrawPoint(points.get(0).getPointX(), points.get(0).getPointY(), points.get(0).getPointZ());
                     }
-                    if (hadStepIntoEndPoint) {
-                        new AlertDialog.Builder(getActivity()).setTitle("你已经走到了终点").setPositiveButton("结束导航", null).show();
-                        hadStepIntoMidPoint = false;
-                        MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
-                        notHaveEndPoint = true;
-                        mThePlaceYouWantGo.setText(R.string.search_place);
+                } else {
+                    if (firstStepDrawLines >= 1) {
+                        startPoint = points.get(0);
+                        mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle()); //就是从搜索界面返回的情形
+                        if (points.size() != 0)
+                            MapInSize.getMapActivity().cleanPoint();
                         MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
                         MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
-                    } else {
-                        if (!points.equals(pathFromOld)) {  //就是如果偏离了路径
-                            new AlertDialog.Builder(getActivity()).setTitle("您已经偏离路径,系统已经重新帮您规划").setPositiveButton("好的", null).show();
-                        } else { //还在路径上
-                            startPoint = points.get(0);
-                            MapInSize.getMapActivity().cleanPoint();
-                            MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
-                            MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+                        firstStepDrawLines--;
+                    }
+                    if (points.size() > 0) {
+                        if (!whetherYouMove(startPoint, points.get(0))) { //如果移动
+                            if (hadStepIntoMidPoint) {  //如果到达中间点
+                                new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("确定", null).show();
+                                hadStepIntoMidPoint = false;
+                            }
+                            if (hadStepIntoEndPoint) {  //如果到达终点
+                                new AlertDialog.Builder(getActivity()).setTitle("你已经走到了终点").setPositiveButton("结束导航", null).show();
+                                hadStepIntoMidPoint = false;
+                                if (points.size() != 0)
+                                    MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
+                                notHaveEndPoint = true;
+                                mThePlaceYouWantGo.setText(R.string.search_place);
+                                MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
+                                MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+                            } else {   //正常范围内移动
+                                if (!points.equals(pathFromOld)) {  //就是如果偏离了路径
+                                    notHaveEndPoint = true;
+                                    if (points.size() != 0)
+                                        MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
+                                    new AlertDialog.Builder(getActivity()).setTitle("您已经偏离路径,是否重新规划").setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+
+                                            notHaveEndPoint = false;
+                                            MapInSize.getMapActivity().cleanPoint();
+                                            // refurbishHandler.removeCallbacks(runnable);
+                                            // refurbishHandler.postDelayed(runnable, 20);
+                                            MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+
+                                        }
+                                    }).setNegativeButton("不用了", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (points.size() != 0)
+                                                MapInSize.getMapActivity().cleanPoint();
+                                            notHaveEndPoint = true;
+                                            mThePlaceYouWantGo.setText(R.string.search_place);
+                                        }
+                                    }).show();
+                                } else { //还在路径上
+                                    startPoint = points.get(0);
+                                    MapInSize.getMapActivity().cleanPoint();
+                                    MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
+                                    MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+                                }
+                            }
                         }
                     }
+
                 }
+            } else {
+                Toast.makeText(getActivity(), "服务器没有打开", Toast.LENGTH_SHORT).show();
+                refurbishHandler.removeCallbacks(runnable);
             }
         }
+
 
     }
 
     private Runnable runnable = new Runnable() {
         public void run() {
             new NetTask(refurbishHandler).execute();
-            refurbishHandler.postDelayed(this, 50);
+            refurbishHandler.postDelayed(this, 20);
         }
     };
 
@@ -330,12 +363,14 @@ public class AirportFragment extends Fragment {
 
     private ArrayList<Point> divideLayePoint(ArrayList<Point> points) { //得到第一层的点 // 每次都获得第一层的点
         ArrayList<Point> firstListPoints = new ArrayList<Point>();
-        firstListPoints.add(points.get(0));
-        for (int i = 1; i < points.size(); i++) {
-            if (points.get(i).getPointZ() == points.get(i - 1).getPointZ()) {
-                firstListPoints.add(points.get(i));
-            } else {
-                return firstListPoints;
+        if (points.size() > 0) {
+            firstListPoints.add(points.get(0));
+            for (int i = 1; i < points.size(); i++) {
+                if (points.get(i).getPointZ() == points.get(i - 1).getPointZ()) {
+                    firstListPoints.add(points.get(i));
+                } else {
+                    return firstListPoints;
+                }
             }
         }
         return firstListPoints;
@@ -351,14 +386,14 @@ public class AirportFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         refurbishHandler.removeCallbacks(runnable);
+        super.onDestroyView();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         refurbishHandler.removeCallbacks(runnable);
+        super.onDestroy();
     }
 
     private void setUpMenu() {

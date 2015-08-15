@@ -54,7 +54,8 @@ public class SearchFragment extends Fragment {
         startPointY = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_Y));
         startPointZ = Double.parseDouble(getArguments().getString(EXTRA_START_PLACE_Z));
 
-        midPoint = new Point("test", 0.0, 0.0, 0.0);
+        midPoint = new Point("测试中间点", 0.0, 0.0, 0.0);
+        endPoint = new Point("测试终点", startPointX, startPointY, startPointZ);
         //mPointList = PointLab.getmPointLab(getActivity(), mEndPlaceString).getmPointList();
         //arrayAdapter = new ArrayAdapter<Point>(getActivity(), android.R.layout.simple_list_item_1, mPointList);
     }

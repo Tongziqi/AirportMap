@@ -88,7 +88,8 @@ public class WelcomeActivity extends SingleFragmentActivity {
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                finish();
+                finish();
             }
         });
         builder.create();
@@ -104,7 +105,11 @@ public class WelcomeActivity extends SingleFragmentActivity {
         NetworkInfo.State gprs = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
         NetworkInfo.State wifi = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState();
         if (gprs == NetworkInfo.State.CONNECTED || gprs == NetworkInfo.State.CONNECTING) {
-            Toast.makeText(this, "开启的是GPRS网络，默认不定位", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "开启的是GPRS网络，即将启动应用", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, AirportActivity.class);
+            startActivity(intent);
+            finish();
+            finish();
         }
         //判断为wifi状态下才加载广告，如果是GPRS手机网络则不加载！
         if (wifi == NetworkInfo.State.CONNECTED || wifi == NetworkInfo.State.CONNECTING) {

@@ -121,8 +121,8 @@ public class MapInSize extends SurfaceView {
         Canvas mCanvas = mHolder.lockCanvas();
         Paint paint = new Paint();
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        mCanvas.drawPaint(paint);
-       // paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+            mCanvas.drawPaint(paint);
+        // paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         mHolder.unlockCanvasAndPost(mCanvas);
     }
 
