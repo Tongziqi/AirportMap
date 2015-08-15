@@ -23,6 +23,7 @@ public class NetConnection {
     public static final String ACTION_LOCATE = "locate";
     public static final String Test = "test";
     public static final String Path = "getPath";
+    public static final String PartPath = "getPartPath";
 
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
@@ -98,7 +99,7 @@ public class NetConnection {
                 allPathString = pointStringUrlPoint + "," + pointString; //这里面把开始节点加进去
             }
             String array[] = allPathString.split(",");
-           // Log.e("MapActivity", Arrays.toString(array));
+            // Log.e("MapActivity", Arrays.toString(array));
 
             for (int i = 0; i < array.length; ) {
                 Point item = new Point();

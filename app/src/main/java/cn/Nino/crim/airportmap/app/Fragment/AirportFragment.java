@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import cn.Nino.crim.airportmap.app.Activity.AirportActivity;
 import cn.Nino.crim.airportmap.app.Activity.SearchActivity;
 import cn.Nino.crim.airportmap.app.Map.MapInSize;
 import cn.Nino.crim.airportmap.app.Point.Point;
@@ -244,48 +245,48 @@ public class AirportFragment extends Fragment {
                         MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
                         firstStepDrawLines--;
                     }
-                    if (points.size() > 0) {
-                        if (!whetherYouMove(startPoint, points.get(0))) { //如果移动
-                            if (hadStepIntoMidPoint) {  //如果到达中间点
-                                new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("确定", null).show();
-                                hadStepIntoMidPoint = false;
-                            }
-                            if (hadStepIntoElevator) {  //如果电梯
-                                new AlertDialog.Builder(getActivity()).setTitle("请乘坐电梯").setPositiveButton("好滴", null).show();
-                                hadStepIntoElevator = false;
-                            }
-                            if (hadStepIntoEndPoint) {  //如果到达终点
-                                new AlertDialog.Builder(getActivity()).setTitle("你已经走到了终点").setPositiveButton("结束导航", null).show();
-                                hadStepIntoEndPoint = false;
-                                MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
+                    if (!whetherYouMove(startPoint, points.get(0))) { //如果移动
+                        if (hadStepIntoMidPoint) {  //如果到达中间点
+                            new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("确定", null).show();
+                            hadStepIntoMidPoint = false;
+                        }
+                        if (hadStepIntoElevator) {  //如果电梯
+                            new AlertDialog.Builder(getActivity()).setTitle("请乘坐电梯").setPositiveButton("好滴", null).show();
+                            hadStepIntoElevator = false;
+                        }
+                        if (hadStepIntoEndPoint) {  //如果到达终点
+                            new AlertDialog.Builder(getActivity()).setTitle("你已经走到了终点").setPositiveButton("结束导航", null).show();
+                            hadStepIntoEndPoint = false;
+                            MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
+                            notHaveEndPoint = true;
+                            mThePlaceYouWantGo.setText(R.string.search_place);
+                            //MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
+                            MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+                        } else {   //正常范围内移动
+                            if (!points.equals(pathFromOld)) {  //就是如果偏离了路径
                                 notHaveEndPoint = true;
-                                mThePlaceYouWantGo.setText(R.string.search_place);
-                                //MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
-                                MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
-                            } else {   //正常范围内移动
-                                if (!points.equals(pathFromOld)) {  //就是如果偏离了路径
-                                    notHaveEndPoint = true;
-                                    MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
-                                    new AlertDialog.Builder(getActivity()).setTitle("您已经偏离路径,是否重新规划").setPositiveButton("好的", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
+                                MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
+                                new AlertDialog.Builder(getActivity()).setTitle("您已经偏离路径,是否重新规划").setPositiveButton("好的", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                                            notHaveEndPoint = false;
-                                            MapInSize.getMapActivity().cleanPoint();
-                                            // refurbishHandler.removeCallbacks(runnable);
-                                            // refurbishHandler.postDelayed(runnable, 20);
-                                            MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
+                                        notHaveEndPoint = false;
+                                        MapInSize.getMapActivity().cleanPoint();
+                                        // refurbishHandler.removeCallbacks(runnable);
+                                        // refurbishHandler.postDelayed(runnable, 20);
+                                        MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
 
-                                        }
-                                    }).setNegativeButton("不用了", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            MapInSize.getMapActivity().cleanPoint();
-                                            notHaveEndPoint = true;
-                                            mThePlaceYouWantGo.setText(R.string.search_place);
-                                        }
-                                    }).show();
-                                } else { //还在路径上
+                                    }
+                                }).setNegativeButton("不用了", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        MapInSize.getMapActivity().cleanPoint();
+                                        notHaveEndPoint = true;
+                                        mThePlaceYouWantGo.setText(R.string.search_place);
+                                    }
+                                }).show();
+                            } else { //还在路径上
+                                if (divideLayePoint(points).size() > 0) {
                                     startPoint = points.get(0);
                                     MapInSize.getMapActivity().cleanPoint();
                                     MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
@@ -294,11 +295,12 @@ public class AirportFragment extends Fragment {
                             }
                         }
                     }
-
                 }
             } else {
-                Toast.makeText(getActivity(), "服务器没有打开", Toast.LENGTH_SHORT).show();
-                refurbishHandler.removeCallbacks(runnable);
+                if (AirportActivity.flagDraw) {  //可以删掉
+                    Toast.makeText(getActivity(), "服务器没有打开", Toast.LENGTH_SHORT).show();
+                    refurbishHandler.removeCallbacks(runnable);
+                }
             }
         }
 

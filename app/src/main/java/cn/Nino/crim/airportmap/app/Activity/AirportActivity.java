@@ -5,10 +5,12 @@ import android.os.Bundle;
 import cn.Nino.crim.airportmap.app.Fragment.AirportFragment;
 
 public class AirportActivity extends SingleFragmentActivity {
+    public static Boolean flagDraw = true;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        flagDraw = true;
         super.onCreate(savedInstanceState);
     }
 
@@ -29,5 +31,11 @@ public class AirportActivity extends SingleFragmentActivity {
         }
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if (mFinishClick == 2) {
+            flagDraw = false;
+        }
+        super.onBackPressed();
+    }
 }
