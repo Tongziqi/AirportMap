@@ -232,8 +232,9 @@ public class AirportFragment extends Fragment {
                     }
                 } else { //如果有终点 那么显示现在的位置和路径
                     if (divideLayePoint(pointArrayListLine).size() > 0) {
-                        if (divideLayePoint(pointArrayListLine).get(divideLayePoint(pointArrayListLine).size() - 1).getPointX() != endPoint.getPointX())
-                            judgeElevator(points.get(0), divideLayePoint(pointArrayListLine).get(divideLayePoint(pointArrayListLine).size() - 1));
+                        Point layerPoint = divideLayePoint(pointArrayListLine).get(divideLayePoint(pointArrayListLine).size() - 1);
+                        if (layerPoint.getPointX() != endPoint.getPointX())
+                            judgeElevator(points.get(0), layerPoint);
                     }
                     if (firstStepDrawLines >= 1) { //如果是第一次导航的时候 开始画路线
                         startPoint = points.get(0);
@@ -255,7 +256,7 @@ public class AirportFragment extends Fragment {
                             }
                             if (hadStepIntoEndPoint) {  //如果到达终点
                                 new AlertDialog.Builder(getActivity()).setTitle("你已经走到了终点").setPositiveButton("结束导航", null).show();
-                                hadStepIntoMidPoint = false;
+                                hadStepIntoEndPoint = false;
                                 MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
                                 notHaveEndPoint = true;
                                 mThePlaceYouWantGo.setText(R.string.search_place);
@@ -352,27 +353,37 @@ public class AirportFragment extends Fragment {
     private boolean judgeMidPoint(Point startPoint, Point midPoint) { //判断是否到中点
         double startPointX = startPoint.getPointX();
         double startPointY = startPoint.getPointY();
+        double startPointZ = startPoint.getPointZ();
+
         double midPointX = midPoint.getPointX();
         double midPointY = midPoint.getPointY();
-        hadStepIntoMidPoint = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05;
+        double midPointZ = midPoint.getPointZ();
+        hadStepIntoMidPoint = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05 && (startPointZ == midPointZ);
         return hadStepIntoMidPoint;
     }
 
     private boolean judgeElevator(Point startPoint, Point elevator) { //判断是否到中点
         double startPointX = startPoint.getPointX();
         double startPointY = startPoint.getPointY();
+        double startPointZ = startPoint.getPointZ();
+
+
         double midPointX = elevator.getPointX();
         double midPointY = elevator.getPointY();
-        hadStepIntoElevator = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05;
+        double midPointZ = elevator.getPointZ();
+        hadStepIntoElevator = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05 && (startPointZ == midPointZ);
         return hadStepIntoElevator;
     }
 
     private boolean judgeEndPoint(Point startPoint, Point endPoint) { //判断是否到终点
         double startPointX = startPoint.getPointX();
         double startPointY = startPoint.getPointY();
+        double startPointZ = startPoint.getPointZ();
+
         double midPointX = endPoint.getPointX();
         double midPointY = endPoint.getPointY();
-        hadStepIntoEndPoint = Math.abs(startPointX - midPointX) < 0.03 && Math.abs(startPointY - midPointY) < 0.05;
+        double midPointZ = endPoint.getPointZ();
+        hadStepIntoEndPoint = Math.abs(startPointX - midPointX) < 0.03 && Math.abs(startPointY - midPointY) < 0.05 && (startPointZ == midPointZ);
         return hadStepIntoEndPoint;
     }
 
