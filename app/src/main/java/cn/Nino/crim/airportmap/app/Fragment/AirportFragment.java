@@ -47,6 +47,7 @@ public class AirportFragment extends Fragment {
     Boolean notHaveEndPoint = true;
     Boolean hadStepIntoMidPoint = false;
     Boolean hadStepIntoEndPoint = false;
+    Boolean hadStepIntoElevator = false;
     Boolean youDonnotMove = false;
     ArrayList<Point> pointArrayListLine = new ArrayList<Point>(); //存储得到的路径 保证不每次都重绘
     ArrayList<Point> pathFromOld = new ArrayList<Point>(); //存储原始的路径
@@ -105,14 +106,14 @@ public class AirportFragment extends Fragment {
         //但是规划路径只需要特定的时候才需要
         new NetTask(handler).execute();
         refurbishHandler.removeCallbacks(runnable);
-        refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
+        refurbishHandler.postDelayed(runnable, 50);  // 定时刷新任务  //看服务器的情况很可能设定为20刷新不出来
 
         mImageButtonLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new NetTask(handler).execute();
                 refurbishHandler.removeCallbacks(runnable);
-                refurbishHandler.postDelayed(runnable, 20);  // 定时刷新任务
+                refurbishHandler.postDelayed(runnable, 50);  // 定时刷新任务
             }
         });
 
@@ -183,18 +184,20 @@ public class AirportFragment extends Fragment {
                 ArrayList<Point> points = new ArrayList<Point>();
                 if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
                     points = getPath();
+                    pointArrayListLine = points;//这里面更新一下
                     Message msg = new Message();
                     msg.what = 100;
                     msg.obj = points;
                     handler.obtainMessage();
                     handler.sendMessage(msg);  //把值传出去
+                    return points;
                 }
                 if (pointArrayListLine.size() != 0) {
                     ArrayList<Point> startPointsList;
                     startPointsList = new NetConnection().getPoint();
 
                     boolean isInLine = PointEstimate.isOnAllPath(startPointsList.get(0), pointArrayListLine, 0.1);
-                    boolean isInSameLayer = startPointsList.get(0).getPointZ() == pointArrayListLine.get(1).getPointZ(); // 是否在同一层
+                    boolean isInSameLayer = startPointsList.get(0).getPointZ() == pointArrayListLine.get(0).getPointZ(); // 是否在同一层
                     if (isInLine && isInSameLayer) {
                         pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
                         points = pointArrayListLine;
@@ -223,17 +226,19 @@ public class AirportFragment extends Fragment {
                 if (notHaveEndPoint) {
                     if (!whetherYouMove(startPoint, points.get(0))) {
                         startPoint = points.get(0);
-                        if (points.size() != 0)
-                            MapInSize.getMapActivity().cleanPoint();
+                        MapInSize.getMapActivity().cleanPoint();
                         MapInSize.getMapActivity().checkFloorZ(points.get(0).getPointZ());
                         MapInSize.getMapActivity().redrawPoint(points.get(0).getPointX(), points.get(0).getPointY(), points.get(0).getPointZ());
                     }
-                } else {
-                    if (firstStepDrawLines >= 1) {
+                } else { //如果有终点 那么显示现在的位置和路径
+                    if (divideLayePoint(pointArrayListLine).size() > 0) {
+                        if (divideLayePoint(pointArrayListLine).get(divideLayePoint(pointArrayListLine).size() - 1).getPointX() != endPoint.getPointX())
+                            judgeElevator(points.get(0), divideLayePoint(pointArrayListLine).get(divideLayePoint(pointArrayListLine).size() - 1));
+                    }
+                    if (firstStepDrawLines >= 1) { //如果是第一次导航的时候 开始画路线
                         startPoint = points.get(0);
                         mThePlaceYouWantGo.setText("您要去：" + endPoint.getmTittle()); //就是从搜索界面返回的情形
-                        if (points.size() != 0)
-                            MapInSize.getMapActivity().cleanPoint();
+                        MapInSize.getMapActivity().cleanPoint();
                         MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
                         MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
                         firstStepDrawLines--;
@@ -244,20 +249,22 @@ public class AirportFragment extends Fragment {
                                 new AlertDialog.Builder(getActivity()).setTitle("你已经走到了中间点").setPositiveButton("确定", null).show();
                                 hadStepIntoMidPoint = false;
                             }
+                            if (hadStepIntoElevator) {  //如果电梯
+                                new AlertDialog.Builder(getActivity()).setTitle("请乘坐电梯").setPositiveButton("好滴", null).show();
+                                hadStepIntoElevator = false;
+                            }
                             if (hadStepIntoEndPoint) {  //如果到达终点
                                 new AlertDialog.Builder(getActivity()).setTitle("你已经走到了终点").setPositiveButton("结束导航", null).show();
                                 hadStepIntoMidPoint = false;
-                                if (points.size() != 0)
-                                    MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
+                                MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
                                 notHaveEndPoint = true;
                                 mThePlaceYouWantGo.setText(R.string.search_place);
-                                MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
+                                //MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
                                 MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
                             } else {   //正常范围内移动
                                 if (!points.equals(pathFromOld)) {  //就是如果偏离了路径
                                     notHaveEndPoint = true;
-                                    if (points.size() != 0)
-                                        MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
+                                    MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
                                     new AlertDialog.Builder(getActivity()).setTitle("您已经偏离路径,是否重新规划").setPositiveButton("好的", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -272,8 +279,7 @@ public class AirportFragment extends Fragment {
                                     }).setNegativeButton("不用了", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            if (points.size() != 0)
-                                                MapInSize.getMapActivity().cleanPoint();
+                                            MapInSize.getMapActivity().cleanPoint();
                                             notHaveEndPoint = true;
                                             mThePlaceYouWantGo.setText(R.string.search_place);
                                         }
@@ -350,6 +356,15 @@ public class AirportFragment extends Fragment {
         double midPointY = midPoint.getPointY();
         hadStepIntoMidPoint = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05;
         return hadStepIntoMidPoint;
+    }
+
+    private boolean judgeElevator(Point startPoint, Point elevator) { //判断是否到中点
+        double startPointX = startPoint.getPointX();
+        double startPointY = startPoint.getPointY();
+        double midPointX = elevator.getPointX();
+        double midPointY = elevator.getPointY();
+        hadStepIntoElevator = Math.abs(startPointX - midPointX) < 0.05 && Math.abs(startPointY - midPointY) < 0.05;
+        return hadStepIntoElevator;
     }
 
     private boolean judgeEndPoint(Point startPoint, Point endPoint) { //判断是否到终点

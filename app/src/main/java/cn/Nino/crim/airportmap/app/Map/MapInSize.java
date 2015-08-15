@@ -68,7 +68,13 @@ public class MapInSize extends SurfaceView {
         } else {
             mCanvas.drawCircle((float) (getMap_x() * pointX), (float) ((getMap_y() * (1 - pointY / 0.38))), 10, mPaint);
         }
-        mHolder.unlockCanvasAndPost(mCanvas);
+        try {
+            if (mHolder != null) {
+                mHolder.unlockCanvasAndPost(mCanvas);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -112,18 +118,32 @@ public class MapInSize extends SurfaceView {
                 mCanvas.drawCircle((float) (getMap_x() * pointEndX), (float) ((getMap_y() * (1 - pointEndY / 0.38))), 10, mPaintCircleEnd);
             }
         }
-        mHolder.unlockCanvasAndPost(mCanvas);
+        try {
+            if (mHolder != null) {
+                mHolder.unlockCanvasAndPost(mCanvas);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
     public void cleanPoint() {
-
-        Canvas mCanvas = mHolder.lockCanvas();
-        Paint paint = new Paint();
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            mCanvas.drawPaint(paint);
-        // paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        mHolder.unlockCanvasAndPost(mCanvas);
+        Canvas canvas = mHolder.lockCanvas();
+        if (canvas != null) {
+            Paint paint = new Paint();
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            canvas.drawPaint(paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        }
+        //主要原因：当点击back按钮时Activity退出视野。此时并不会出现画面更新情况，但是用于更新动画的线程仍然在工作，即flag = true。由于Activity已退出解锁操作holder.unlockCanvasAndPost(canvas);不能完成因此就会引发上述异常。
+        try {
+            if (mHolder != null) {
+                mHolder.unlockCanvasAndPost(canvas);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void checkFloorZ(double pointZ) {
