@@ -30,7 +30,6 @@ import java.util.ArrayList;
  * Created by Administrator on 2015/3/26 0026.
  */
 public class AirportFragment extends Fragment {
-    public static final String TAG = " ";
     public static final int SEARCH_CODE = 1;
     private int firstStepDrawLines = 1;
     private Button mButtonB1, mButtonF1, mButtonF2;
@@ -44,7 +43,10 @@ public class AirportFragment extends Fragment {
     private String startPointAndEndPoint;
     private String startPointAndMidPoint;
     private String midPointAndEndPoint;
+    private int controlElevator = 1;
+    private int layerOfNow = 0; //显示现在的位置
     private ResideMenu resideMenu;
+    Boolean initMapTrue = true;
     Boolean notHaveEndPoint = true;
     Boolean hadStepIntoMidPoint = false;
     Boolean hadStepIntoEndPoint = false;
@@ -79,6 +81,8 @@ public class AirportFragment extends Fragment {
         double startPointX = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_X, 0);
         double startPointY = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Y, 0);
         double startPointZ = getActivity().getIntent().getDoubleExtra(SearchFragment.EXTRA_START_PLACE_Z, 0);
+
+        layerOfNow = (int) startPointZ;
         startPoint = new Point("startPoint", startPointX, startPointY, startPointZ);
 
     }
@@ -179,51 +183,63 @@ public class AirportFragment extends Fragment {
         @Override
         protected ArrayList<Point> doInBackground(Void... params) {
             if (notHaveEndPoint) {
+                layerOfNow = (int) new NetConnection().getPoint().get(0).getPointZ();
                 return new NetConnection().getPoint();
             } else {
                 initMap();
-                ArrayList<Point> points = new ArrayList<Point>();
-                if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
-                    points = getPath();
-                    pointArrayListLine = points;//这里面更新一下
-                    Message msg = new Message();
-                    msg.what = 100;
-                    msg.obj = points;
-                    handler.obtainMessage();
-                    handler.sendMessage(msg);  //把值传出去
-                    return points;
-                }
-                if (pointArrayListLine.size() != 0) {
-                    ArrayList<Point> startPointsList;
-                    startPointsList = new NetConnection().getPoint();
 
-                    boolean isInLine = PointEstimate.isOnAllPath(startPointsList.get(0), pointArrayListLine, 0.1);
-                    boolean isInSameLayer = startPointsList.get(0).getPointZ() == pointArrayListLine.get(0).getPointZ(); // 是否在同一层
-                    if (isInLine && isInSameLayer) {
-                        pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
-                        points = pointArrayListLine;
-                        pathFromOld = (ArrayList<Point>) pointArrayListLine.clone();
-                    } else {
-                        // Log.e("不在这个位置上面，目前的点是:", startPointsList.get(0).toString());
-                        points.clear(); //删除points
-                        pointArrayListLine.clear();
-                        startPoint = startPointsList.get(0);
-                        initMap();  //重新获得起点和终点
+                ArrayList<Point> points = new ArrayList<Point>();
+
+                if (initMapTrue) {
+                    if (pointArrayListLine.size() == 0) { //如果没有路径 即第一次取得数据 那么开始规划数据
                         points = getPath();
-                        pointArrayListLine = points; // 这时候赋值新的pointArrayListLine
+                        pointArrayListLine = points;//这里面更新一下
+                        controlElevator = 1; //重新规划路径 变成初始化的值
                         Message msg = new Message();
                         msg.what = 100;
                         msg.obj = points;
+                        handler.obtainMessage();
                         handler.sendMessage(msg);  //把值传出去
+                        return points;
                     }
+                    if (pointArrayListLine.size() != 0) {
+                        ArrayList<Point> startPointsList;
+                        startPointsList = new NetConnection().getPoint();
+
+                        boolean isInLine = PointEstimate.isOnAllPath(startPointsList.get(0), pointArrayListLine, 0.1);
+                        boolean isInSameLayer = startPointsList.get(0).getPointZ() == pointArrayListLine.get(0).getPointZ(); // 是否在同一层
+                        if (isInLine && isInSameLayer) {
+                            pointArrayListLine.set(0, startPointsList.get(0));  //把开头的节点改变 中间的点不变 形成新路线
+                            points = pointArrayListLine;
+                            pathFromOld = (ArrayList<Point>) pointArrayListLine.clone();
+                        } else {
+                            // Log.e("不在这个位置上面，目前的点是:", startPointsList.get(0).toString());
+                            controlElevator = 1; //重新规划路径 变成初始化的值
+                            points.clear(); //删除points
+                            pointArrayListLine.clear();
+                            startPoint = startPointsList.get(0);
+                            initMap();  //重新获得起点和终点
+                            points = getPath();
+                            pointArrayListLine = points; // 这时候赋值新的pointArrayListLine
+                            Message msg = new Message();
+                            msg.what = 100;
+                            msg.obj = points;
+                            handler.sendMessage(msg);  //把值传出去
+                        }
+                    }
+                    layerOfNow = (int) points.get(0).getPointZ();
                 }
                 return points;
+
             }
+
         }
 
         @Override
         protected void onPostExecute(final ArrayList<Point> points) {
+            changeColor(); //判断颜色
             if (points.size() > 0) {
+                int layer = 0;
                 if (notHaveEndPoint) {
                     if (!whetherYouMove(startPoint, points.get(0))) {
                         startPoint = points.get(0);
@@ -232,10 +248,14 @@ public class AirportFragment extends Fragment {
                         MapInSize.getMapActivity().redrawPoint(points.get(0).getPointX(), points.get(0).getPointY(), points.get(0).getPointZ());
                     }
                 } else { //如果有终点 那么显示现在的位置和路径
-                    if (divideLayePoint(pointArrayListLine).size() > 0) {
-                        Point layerPoint = divideLayePoint(pointArrayListLine).get(divideLayePoint(pointArrayListLine).size() - 1);
-                        if (layerPoint.getPointX() != endPoint.getPointX())
-                            judgeElevator(points.get(0), layerPoint);
+                    layer = (int) endPoint.getPointZ();
+                    if (controlElevator > 0) {  // 控制每一层只出现一次
+                        if (divideLayePoint(pointArrayListLine).size() > 0) {
+                            Point layerPoint = divideLayePoint(pointArrayListLine).get(divideLayePoint(pointArrayListLine).size() - 1);
+                            if (layerPoint.getPointX() != endPoint.getPointX())
+                                judgeElevator(points.get(0), layerPoint);
+                        }
+                        controlElevator--;
                     }
                     if (firstStepDrawLines >= 1) { //如果是第一次导航的时候 开始画路线
                         startPoint = points.get(0);
@@ -251,7 +271,15 @@ public class AirportFragment extends Fragment {
                             hadStepIntoMidPoint = false;
                         }
                         if (hadStepIntoElevator) {  //如果电梯
-                            new AlertDialog.Builder(getActivity()).setTitle("请乘坐电梯").setPositiveButton("好滴", null).show();
+                            if (layer == 0) {
+                                new AlertDialog.Builder(getActivity()).setTitle("请乘坐电梯到地下一层").setPositiveButton("好滴", null).show();
+                            }
+                            if (layer == 1) {
+                                new AlertDialog.Builder(getActivity()).setTitle("请乘坐电梯到一层").setPositiveButton("好滴", null).show();
+                            }
+                            if (layer == 2) {
+                                new AlertDialog.Builder(getActivity()).setTitle("请乘坐电梯到二层").setPositiveButton("好滴", null).show();
+                            }
                             hadStepIntoElevator = false;
                         }
                         if (hadStepIntoEndPoint) {  //如果到达终点
@@ -260,7 +288,6 @@ public class AirportFragment extends Fragment {
                             MapInSize.getMapActivity().cleanPoint();  // 这里面结束导航
                             notHaveEndPoint = true;
                             mThePlaceYouWantGo.setText(R.string.search_place);
-                            //MapInSize.getMapActivity().checkFloorZ(divideLayePoint(points).get(0).getPointZ());
                             MapInSize.getMapActivity().redrawLine(divideLayePoint(points));
                         } else {   //正常范围内移动
                             if (!points.equals(pathFromOld)) {  //就是如果偏离了路径
@@ -331,25 +358,31 @@ public class AirportFragment extends Fragment {
     }
 
     private void initMap() {
-        judgeEndPoint(startPoint, endPoint);
-        if (midPoint.getPointX() == 0.0 && midPoint.getPointY() == 0.0
-                && midPoint.getPointZ() == 0.0 || judgeMidPoint(startPoint, midPoint)) {
-            if (startPoint != null && endPoint != null) {   //这里面是没有中间点
-                midPoint.setPointX(0.0);
-                midPoint.setPointY(0.0);
-                midPoint.setPointZ(0.0);  //这样写是因为走过中间点后，就把中间点变成0
+        if (startPoint.getPointZ() != 0 || startPoint.getPointY() < 0.38) {
+            initMapTrue = true;
+            judgeEndPoint(startPoint, endPoint);
+            if (midPoint.getPointX() == 0.0 && midPoint.getPointY() == 0.0
+                    && midPoint.getPointZ() == 0.0 || judgeMidPoint(startPoint, midPoint)) {
+                if (startPoint != null && endPoint != null) {   //这里面是没有中间点
+                    midPoint.setPointX(0.0);
+                    midPoint.setPointY(0.0);
+                    midPoint.setPointZ(0.0);  //这样写是因为走过中间点后，就把中间点变成0
+                    String startPointString = startPoint.getPointString(startPoint);
+                    String endPointString = endPoint.getPointString(endPoint);
+                    startPointAndEndPoint = startPointString + "/" + endPointString;
+                }
+            } else { //如果有中间点
                 String startPointString = startPoint.getPointString(startPoint);
+                String midPointString = midPoint.getPointString(midPoint);
                 String endPointString = endPoint.getPointString(endPoint);
-                startPointAndEndPoint = startPointString + "/" + endPointString;
+                startPointAndEndPoint = null;
+                startPointAndMidPoint = startPointString + "/" + midPointString;
+                midPointAndEndPoint = midPointString + "/" + endPointString;
             }
-        } else { //如果有中间点
-            String startPointString = startPoint.getPointString(startPoint);
-            String midPointString = midPoint.getPointString(midPoint);
-            String endPointString = endPoint.getPointString(endPoint);
-            startPointAndEndPoint = null;
-            startPointAndMidPoint = startPointString + "/" + midPointString;
-            midPointAndEndPoint = midPointString + "/" + endPointString;
+        } else {
+            initMapTrue = false;
         }
+
     }
 
     private boolean judgeMidPoint(Point startPoint, Point midPoint) { //判断是否到中点
@@ -472,6 +505,24 @@ public class AirportFragment extends Fragment {
         resideMenu.clearIgnoredViewList();
         Intent intent = new Intent(getActivity(), targetActivity.getClass());
         startActivity(intent);
+    }
+
+    private void changeColor() {
+        if (layerOfNow == 0) {
+            mButtonB1.setBackgroundResource(R.drawable.b1_pressed);
+            mButtonF1.setBackgroundResource(R.drawable.f1_press);
+            mButtonF2.setBackgroundResource(R.drawable.f2_press);
+        }
+        if (layerOfNow == 1) {
+            mButtonB1.setBackgroundResource(R.drawable.b1_press);
+            mButtonF1.setBackgroundResource(R.drawable.f1_pressed);
+            mButtonF2.setBackgroundResource(R.drawable.f2_press);
+        }
+        if (layerOfNow == 2) {
+            mButtonB1.setBackgroundResource(R.drawable.b1_press);
+            mButtonF1.setBackgroundResource(R.drawable.f1_press);
+            mButtonF2.setBackgroundResource(R.drawable.f2_pressed);
+        }
     }
 
 }

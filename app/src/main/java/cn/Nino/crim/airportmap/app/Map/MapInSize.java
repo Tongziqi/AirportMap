@@ -6,7 +6,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 import cn.Nino.crim.airportmap.app.Activity.AirportActivity;
 import cn.Nino.crim.airportmap.app.R;
 
@@ -65,12 +64,8 @@ public class MapInSize extends SurfaceView {
             mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);//抗拒次
             mPaint.setColor(Color.RED);
             if (mCanvas != null) {
-                if (pointZ != 0.0) {
+                if (pointZ != 0 || pointY < 0.38) {
                     mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaint);
-                } else if (pointY > 0.38) {
-                    //Toast.makeText(getContext().getApplicationContext(), "对不起已经超出范围", Toast.LENGTH_SHORT).show();
-                } else {
-                    mCanvas.drawCircle((float) (getMap_x() * pointX), (float) ((getMap_y() * (1 - pointY / 0.38))), 10, mPaint);
                 }
             }
             try {
@@ -111,21 +106,20 @@ public class MapInSize extends SurfaceView {
                 if (mCanvas != null) {
                     for (int i = 1; i < points.size() - 1; i++) {
                         checkFloorZ(points.get(i).getPointZ());
-                        if (points.get(i).getPointZ() != 0.0 && points.get(i + 1).getPointZ() != 0.0) {
-                            mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaintCircleStart);
-                            mCanvas.drawLine((float) (points.get(i).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i).getPointY())),
-                                    (float) (points.get(i + 1).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i + 1).getPointY())), mPaint);
-                            mCanvas.drawCircle((float) (getMap_x() * pointEndX), (float) (getMap_y() * (1 - pointEndY)), 10, mPaintCircleEnd);
 
+                        mCanvas.drawCircle((float) (getMap_x() * pointX), (float) (getMap_y() * (1 - pointY)), 10, mPaintCircleStart);
+                        mCanvas.drawLine((float) (points.get(i).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i).getPointY())),
+                                (float) (points.get(i + 1).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i + 1).getPointY())), mPaint);
+                        mCanvas.drawCircle((float) (getMap_x() * pointEndX), (float) (getMap_y() * (1 - pointEndY)), 10, mPaintCircleEnd);
 
-                        } else if (points.get(i).getPointY() > 0.38 || points.get(i + 1).getPointY() > 0.38) {
+                       /* } else if (points.get(i).getPointY() > 0.38 || points.get(i + 1).getPointY() > 0.38) {
                             Toast.makeText(getContext().getApplicationContext(), "对不起已经超出范围", Toast.LENGTH_SHORT).show();
                         } else {
                             mCanvas.drawCircle((float) (getMap_x() * pointX), (float) ((getMap_y() * (1 - pointY / 0.38))), 10, mPaintCircleStart);
                             mCanvas.drawLine((float) (points.get(i).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i).getPointY() / 0.38)),
                                     (float) (points.get(i + 1).getPointX() * getMap_x()), (float) (getMap_y() * (1 - points.get(i + 1).getPointY() / 0.38)), mPaint);
                             mCanvas.drawCircle((float) (getMap_x() * pointEndX), (float) ((getMap_y() * (1 - pointEndY / 0.38))), 10, mPaintCircleEnd);
-                        }
+                        }*/
                     }
                 }
                 try {

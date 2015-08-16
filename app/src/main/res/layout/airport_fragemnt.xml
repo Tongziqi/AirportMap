@@ -8,16 +8,6 @@
                   android:orientation="horizontal"
                   android:layout_marginLeft="8dp"
                   android:layout_marginRight="8dp">
-        <!--<EditText android:layout_width="200dp"
-                  android:layout_height="wrap_content"
-                  android:id="@+id/search_place"
-                  android:text="@string/search_place"
-                  android:inputType="text"/>
-        <ImageButton android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:id="@+id/search_place_button"
-                     android:background="@drawable/searchc_hange_color"
-                     android:contentDescription="@string/search_button"/>-->
         <ImageView android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
                    android:background="@drawable/topbg"

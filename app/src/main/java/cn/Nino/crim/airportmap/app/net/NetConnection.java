@@ -20,6 +20,7 @@ public class NetConnection {
     public static final String SEVER_URL_FORMAL = "http://172.18.4.166:8080/Access";
     public static final String SEVER_URL_OPEN = "http://172.21.14.44:8080/user/Access";
     public static final String SEVER_URL_MOHANWEN = "http://172.18.4.46:8080/Access";
+    public static final String SEVER_URL_OPEN_BJUT = "http://172.18.3.57:8080/Access";
     public static final String ACTION_LOCATE = "locate";
     public static final String Test = "test";
     public static final String Path = "getPath";
@@ -73,7 +74,7 @@ public class NetConnection {
     }
 
     public ArrayList<Point> getPoint() {
-        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
+        String url = Uri.parse(SEVER_URL_OPEN_BJUT).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
         return downloadPoint(url);
@@ -81,10 +82,10 @@ public class NetConnection {
 
     public ArrayList<Point> getPathPoint(String nativePoints, boolean hasMidPoint) {
         String allPathString; //产生的路径
-        String urlPoint = Uri.parse(SEVER_URL_OPEN).buildUpon()
+        String urlPoint = Uri.parse(SEVER_URL_OPEN_BJUT).buildUpon()
                 .appendQueryParameter("action", ACTION_LOCATE)
                 .build().toString();
-        String url = Uri.parse(SEVER_URL_OPEN).buildUpon()
+        String url = Uri.parse(SEVER_URL_OPEN_BJUT).buildUpon()
                 .appendQueryParameter("action", Path)
                 .appendQueryParameter("Points", nativePoints)
                 .build().toString();

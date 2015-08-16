@@ -71,7 +71,6 @@ public class Point {
     }
 
     public String getPointString(Point point) {
-
         return String.valueOf(point.getPointX()) + ","
                 + String.valueOf(point.getPointY()) + ","
                 + String.valueOf(point.getPointZ());
