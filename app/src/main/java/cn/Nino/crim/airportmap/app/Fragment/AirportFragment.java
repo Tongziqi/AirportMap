@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -227,8 +228,10 @@ public class AirportFragment extends Fragment {
                             handler.sendMessage(msg);  //把值传出去
                         }
                     }
-                    layerOfNow = (int) points.get(0).getPointZ();
+                    if (points.size() > 0)
+                        layerOfNow = (int) points.get(0).getPointZ();
                 } else {
+                    notHaveEndPoint = true;
                     points = new NetConnection().getPoint();
                 }
                 return points;
@@ -327,6 +330,7 @@ public class AirportFragment extends Fragment {
                 }
             } else {
                 if (AirportActivity.flagDraw) {  //可以删掉
+                    Log.e("没有获得数据", "没有获得数据");
                     Toast.makeText(getActivity(), "服务器没有打开", Toast.LENGTH_SHORT).show();
                     refurbishHandler.removeCallbacks(runnable);
                 }
