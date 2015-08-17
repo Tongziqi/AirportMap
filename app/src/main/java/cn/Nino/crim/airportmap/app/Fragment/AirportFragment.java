@@ -228,6 +228,8 @@ public class AirportFragment extends Fragment {
                         }
                     }
                     layerOfNow = (int) points.get(0).getPointZ();
+                } else {
+                    points = new NetConnection().getPoint();
                 }
                 return points;
 
